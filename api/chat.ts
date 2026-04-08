@@ -1,13 +1,11 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+export default async function handler(req: any, res: any) {
+    // El resto del código se mantiene igual
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Método no permitido' });
+    }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Solo permitimos POST para que nadie use tu cuota desde el navegador
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método no permitido' });
-  }
-
-  const { question } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY; // Se lee desde los secretos de Vercel
+    const { question } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
 
   try {
     // Cambiamos el modelo en la URL: de gemini-2.0 o gemini-3 a gemini-1.5-flash

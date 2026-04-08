@@ -24,7 +24,7 @@ Nombre: Nico
 Ubicación: Argentina
 Trabajo: Desarrollador, trabaja con automatización, streaming, apps Android TV y bots de WhatsApp.
 Proyectos: Construyó una app Android TV para Canal 8 Mar del Plata, integra Claude con WhatsApp via MCP, maneja infraestructura en Google Cloud.
-Intereses: River Plate, tecnología, desarrollo de software.
+Intereses: Pasar tiempo con familia y sus perros, tecnología en general, entrenamiento en crossfit.
 
 Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, decí que no tenés esa información.`
           },

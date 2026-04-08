@@ -292,7 +292,7 @@ export default function App() {
             </div>
             <div className="w-full md:w-1/3 aspect-square rounded-3xl overflow-hidden bg-neutral-800 relative group">
               <img 
-                src="https://picsum.photos/seed/mar-del-plata/800/800" 
+                src="tyrion.jpeg" 
                 alt="Mar del Plata Vibes" 
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                 referrerPolicy="no-referrer"

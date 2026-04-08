@@ -15,6 +15,7 @@ import {
   Cpu,
   Waves
 } from 'lucide-react';
+import { Link } from 'react-router-dom'; // ✅ Agregado
 import { askBotPilot } from './lib/gemini';
 
 export default function App() {
@@ -237,23 +238,32 @@ export default function App() {
                 title: "Bot Pilot",
                 desc: "Automatización de IA personalizada para procesamiento de datos e interacción con clientes.",
                 icon: <MessageSquare className="text-indigo-400" />,
-                color: "from-indigo-500/20 to-transparent"
+                color: "from-indigo-500/20 to-transparent",
+                link: "https://www.instagram.com/botpilot.app/" // ✅ Quote cerrada
               }
             ].map((project, i) => (
-              <motion.div 
-                key={i}
-                whileHover={{ scale: 1.02 }}
-                className={`p-8 rounded-3xl bg-gradient-to-br ${project.color} border border-white/5 hover:border-white/10 transition-all cursor-pointer group`}
+              // ✅ Envuelto en Link con target="_blank" para enlaces externos
+              <Link 
+                key={i} 
+                to={project.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block" // Asegura que el Link ocupe todo el espacio
               >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="p-3 rounded-xl bg-white/5">
-                    {project.icon}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className={`p-8 rounded-3xl bg-gradient-to-br ${project.color} border border-white/5 hover:border-white/10 transition-all group`}
+                >
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-3 rounded-xl bg-white/5">
+                      {project.icon}
+                    </div>
+                    <ChevronRight className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
                   </div>
-                  <ChevronRight className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                </div>
-                <h4 className="text-2xl font-display font-semibold mb-2">{project.title}</h4>
-                <p className="text-neutral-400">{project.desc}</p>
-              </motion.div>
+                  <h4 className="text-2xl font-display font-semibold mb-2">{project.title}</h4>
+                  <p className="text-neutral-400">{project.desc}</p>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </section>

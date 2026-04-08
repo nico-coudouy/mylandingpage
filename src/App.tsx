@@ -276,7 +276,7 @@ export default function App() {
               </div>
               <h2 className="text-4xl font-display font-bold">Más allá del lente</h2>
               <p className="text-neutral-400 text-lg leading-relaxed">
-                Cuando no estoy detrás de una cámara o una consola, me encontrarás explorando la costa de Mar del Plata con mi perro. 
+                Cuando no estoy detrás de una cámara o una consola, me encontrarás explorando la costa de Mar del Plata con mis perros. 
                 Creo que una vida equilibrada alimenta la creatividad y la precisión técnica.
               </p>
               <div className="flex gap-4">

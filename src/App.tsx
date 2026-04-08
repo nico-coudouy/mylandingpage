@@ -286,7 +286,7 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-2 text-neutral-300">
                   <Waves size={20} className="text-blue-400" />
-                  <span>Entusiasta del océano</span>
+                  <span>Mi paz tiene forma de horizonte</span>
                 </div>
               </div>
             </div>

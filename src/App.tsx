@@ -15,7 +15,6 @@ import {
   Cpu,
   Waves
 } from 'lucide-react';
-import { Link } from 'react-router-dom'; // ✅ Agregado
 import { askBotPilot } from './lib/gemini';
 
 export default function App() {

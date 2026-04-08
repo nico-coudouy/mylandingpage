@@ -230,7 +230,7 @@ export default function App() {
                 title: "NEXCO",
                 desc: "Soluciones innovadoras en integración de medios y tecnología.",
                 icon: <Cpu className="text-blue-400" />,
-                color: "from-blue-500/20 to-transparent"
+                color: "from-blue-500/20 to-transparent",
                 link: "https://www.instagram.com/nexco.tech/"
               },
               {

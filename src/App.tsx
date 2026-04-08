@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import tyrionRomaImg from './tyrionroma.jpeg';
 import { 
   Camera, 
   Video, 
@@ -292,10 +293,9 @@ export default function App() {
             </div>
             <div className="w-full md:w-1/3 aspect-square rounded-3xl overflow-hidden bg-neutral-800 relative group">
               <img 
-                src="tyrion.jpeg" 
+                src={tyrionRomaImg}  // ✅ Usá la variable importada
                 alt="Mar del Plata Vibes" 
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>

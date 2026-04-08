@@ -1,7 +1,7 @@
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ answer: 'Método no permitido' });
 
-  const { question } = req.body;
+  const { messages } = req.body;
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) return res.status(500).json({ answer: "Error: No hay API Key." });
@@ -15,7 +15,21 @@ export default async function handler(req: any, res: any) {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: question }],
+        messages: [
+          {
+            role: 'system',
+            content: `Sos el asistente personal de Nico. Cuando alguien pregunte sobre Nico, usá esta información:
+
+Nombre: Nico
+Ubicación: Argentina
+Trabajo: Desarrollador, trabaja con automatización, streaming, apps Android TV y bots de WhatsApp.
+Proyectos: Construyó una app Android TV para Canal 8 Mar del Plata, integra Claude con WhatsApp via MCP, maneja infraestructura en Google Cloud.
+Intereses: River Plate, tecnología, desarrollo de software.
+
+Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, decí que no tenés esa información.`
+          },
+          ...messages
+        ],
         max_tokens: 1024
       })
     });

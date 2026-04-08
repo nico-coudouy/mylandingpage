@@ -7,8 +7,7 @@ export default async function handler(req: any, res: any) {
   if (!apiKey) return res.status(500).json({ answer: "Error: No hay API Key." });
 
   try {
-    // EL CAMBIO TÉCNICO: Usamos el modelo 1.5-flash-8b (Alta disponibilidad)
-    const model = 'gemini-1.5-flash-8b'; 
+    const model = 'gemini-1.5-flash-8b';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
@@ -22,7 +21,6 @@ export default async function handler(req: any, res: any) {
     const data = await response.json();
 
     if (data.error) {
-      // Si este da 404, probaremos con el 'gemini-pro' (el estándar de oro)
       return res.status(200).json({ 
         answer: `Error de Google (${model}): ${data.error.message}` 
       });

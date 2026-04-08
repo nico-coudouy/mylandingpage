@@ -18,9 +18,9 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    // 3. Configuración del Endpoint: Usamos v1 para máxima estabilidad
-    const model = 'gemini-1.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+    // 1. Usamos el nombre técnico exacto: gemini-1.5-flash-latest o gemini-1.5-flash
+    // 2. Volvemos a v1beta si v1 falla, ya que Flash 1.5 a veces vive ahí en ciertas regiones
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -28,44 +28,25 @@ export default async function handler(req: any, res: any) {
       body: JSON.stringify({
         contents: [{
           parts: [{ 
-            text: `Sos Bot Pilot, el asistente de IA de Nico Coudouy. 
-            Nico vive en Mar del Plata y es experto en Video, IT y Datos. 
-            Responde de forma profesional, tecnológica y concisa (máximo 3 oraciones). 
-            Pregunta del usuario: ${question}` 
+            text: `Sos Bot Pilot, asistente de Nico Coudouy. Pregunta: ${question}` 
           }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 250,
-        }
+        }]
       })
     });
 
     const data = await response.json();
 
-    // 4. Manejo de Errores de la API de Google
+    // Si sigue dando 404, Google nos dirá por qué en este bloque
     if (data.error) {
       return res.status(200).json({ 
-        answer: `Google Error: ${data.error.message} (Código: ${data.error.code})` 
+        answer: `Error de Google: ${data.error.message} (Código: ${data.error.code})` 
       });
     }
 
-    // 5. Extracción de dividendos (la respuesta de texto)
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!text) {
-      return res.status(200).json({ 
-        answer: "Google no devolvió texto. Podría ser un filtro de seguridad o cuota excedida." 
-      });
-    }
-
-    // 6. Retorno de inversión exitoso
-    return res.status(200).json({ answer: text });
+    return res.status(200).json({ answer: text || "Sin texto de respuesta" });
 
   } catch (error: any) {
-    // 7. Contingencia ante errores de red o ejecución
-    return res.status(500).json({ 
-      answer: `Error crítico en el servidor: ${error.message}` 
-    });
+    return res.status(500).json({ answer: `Error de red: ${error.message}` });
   }
 }

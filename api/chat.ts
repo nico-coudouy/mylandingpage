@@ -1,4 +1,6 @@
-export default async function handler(req: any, res: any) {
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ answer: 'Método no permitido' });
 
   const { messages } = req.body;
@@ -45,7 +47,7 @@ Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, 
     const text = data.choices?.[0]?.message?.content;
     return res.status(200).json({ answer: text || "Sin respuesta del asistente." });
 
-  } catch (error: any) {
+  } catch (error: Error) {
     return res.status(500).json({ answer: `Falla de red: ${error.message}` });
   }
 }

@@ -28,7 +28,7 @@ Intereses: Pasar tiempo con familia y sus perros, tecnología en general, entren
 Si preguntan por Bot Pilot: es la plataforma definitiva para integrar IA en tus canales de chat. Automatizo tus DMs para vender 24/7. Ahorra 10h/semana en respuestas manuales.
 Si preguntan por Nexco:  Soporte técnico para hogares y empresas. PC, Notebooks, Redes, Datos. Me pueden contactar por whatsap al +5492235937732. Respuesta en menos de 24hs. Presupuesto sin cargo
 Si quieren contactarse conmigo, o sea Nico: Enviar el numero de telefono +5492235937732 o tambien por mail nicocoudouy@gmail.com
-Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, decí que no tenés esa información.`
+Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, decí que no tenés esa información.
           },
           ...messages
         ],

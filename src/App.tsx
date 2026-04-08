@@ -239,16 +239,16 @@ export default function App() {
                 desc: "Automatización de IA personalizada para procesamiento de datos e interacción con clientes.",
                 icon: <MessageSquare className="text-indigo-400" />,
                 color: "from-indigo-500/20 to-transparent",
-                link: "https://www.instagram.com/botpilot.app/" // ✅ Quote cerrada
+                link: "https://www.instagram.com/botpilot.app/"
               }
             ].map((project, i) => (
-              // ✅ Envuelto en Link con target="_blank" para enlaces externos
-              <Link 
+              // ✅ Usamos <a> para enlaces externos - SIN react-router-dom
+              <a 
                 key={i} 
-                to={project.link} 
+                href={project.link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block" // Asegura que el Link ocupe todo el espacio
+                className="block"
               >
                 <motion.div 
                   whileHover={{ scale: 1.02 }}
@@ -263,7 +263,7 @@ export default function App() {
                   <h4 className="text-2xl font-display font-semibold mb-2">{project.title}</h4>
                   <p className="text-neutral-400">{project.desc}</p>
                 </motion.div>
-              </Link>
+              </a>
             ))}
           </div>
         </section>

@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nico Coudouy — Landing Page
 
-# Run and deploy your AI Studio app
+Portfolio personal de Nico Coudouy, operador de cámara, editor de video y especialista en IT radicado en Mar del Plata.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/cbf17f0f-1050-4bac-a8bd-a55421aad60f
+- **React + TypeScript** — Vite
+- **Tailwind CSS**
+- **Framer Motion** — animaciones
+- **Gemini API** — Bot Pilot, asistente de IA integrado
 
-## Run Locally
+## Funcionalidades
 
-**Prerequisites:**  Node.js
+- Hero con presentación profesional
+- Grilla de servicios (producción de medios, soporte IT, data entry)
+- Bot Pilot: chat con IA entrenado sobre los servicios de Nico
+- Sección de proyectos destacados (NEXCO y Bot Pilot)
+- Sección personal con foto
+- Links a Instagram y Linktree
 
+## Correr localmente
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Requisitos:** Node.js 18+
+
+1. Clonar el repositorio
+2. Instalar dependencias:
+```bash
+   npm install
+```
+3. Crear un archivo `.env.local` y agregar la API key de Gemini:
+VITE_GEMINI_API_KEY=...
+4. Correr el servidor de desarrollo:
+```bash
+   npm run dev
+```
+
+## Deploy
+
+Configurado para desplegarse en Vercel. Cada push a `main` genera un deploy automático.

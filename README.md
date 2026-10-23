@@ -15,7 +15,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
   - Tiza: app de reservas para gimnasios.
   - Festival Internacional de Cine de Mar del Plata: edición para redes.
   - LiveRundown: proyecto en desarrollo.
-- **Asistente con IA:** chat que responde sobre mi perfil con Llama 3.3 vía Groq, con límite de uso por visitante y por día.
+- **Asistente con IA:** chat que responde sobre mi perfil con GPT-OSS 120B vía Groq, con límite de uso por visitante y por día.
 - **Microinteracciones:** campo de puntos que reacciona al mouse, monitor de cámara con timecode en vivo, consola que tipea comandos y navegador que recorre una web.
 - **Accesible y liviano:** respeta `prefers-reduced-motion`, los videos se pausan fuera de pantalla y no usa librerías de UI.
 
@@ -24,7 +24,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 - React 19 + TypeScript + Vite
 - CSS propio, sin frameworks
 - Vercel Functions (`api/chat.ts`) para el asistente
-- Groq (Llama 3.3 70B) como modelo, con un proveedor de respaldo opcional
+- Groq (GPT-OSS 120B) como modelo, con un proveedor de respaldo opcional
 - Upstash Redis + `@upstash/ratelimit` para los límites de uso
 - Vercel Analytics
 
@@ -35,7 +35,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 | Regla | Valor |
 |---|---|
 | Preguntas por visitante (IP) | 10 por día |
-| Preguntas totales del sitio | 300 por día |
+| Preguntas totales del sitio | 100 por día |
 | Largo máximo de una pregunta | 500 caracteres |
 | Mensajes de contexto enviados | últimos 8 |
 | Largo máximo de la respuesta | 350 tokens |
@@ -52,7 +52,7 @@ Copiá `.env.example` a `.env.local` para desarrollo, o cargalas en Vercel:
 |---|---|---|
 | `GROQ_API_KEY` | Sí | Clave de [Groq](https://console.groq.com/keys) |
 | `KV_REST_API_URL` y `KV_REST_API_TOKEN` | Recomendada | Las crea Vercel al conectar Upstash Redis desde el Marketplace. También acepta `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`. |
-| `GROQ_MODEL` | No | Cambia el modelo de Groq (por defecto `llama-3.3-70b-versatile`) |
+| `GROQ_MODEL` | No | Cambia el modelo de Groq (por defecto `openai/gpt-oss-120b`) |
 | `FALLBACK_API_URL`, `FALLBACK_API_KEY`, `FALLBACK_MODEL` | No | Proveedor de respaldo compatible con la API de OpenAI (Cerebras, Gemini, etc.) |
 | `ALLOWED_ORIGINS` | No | Dominios extra habilitados, separados por coma (por ejemplo, un dominio propio) |
 

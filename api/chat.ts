@@ -110,7 +110,13 @@ function allowedOrigins(): string[] {
   for (const host of [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]) {
     if (host) list.push(`https://${host}`);
   }
-  list.push('https://mylandingpage-one.vercel.app', 'http://localhost:3000', 'http://localhost:5173');
+  list.push(
+    'https://www.nicolascoudouy.com.ar',
+    'https://nicolascoudouy.com.ar',
+    'https://mylandingpage-one.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  );
   return list;
 }
 

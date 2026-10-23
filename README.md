@@ -2,7 +2,7 @@
 
 Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años de experiencia en televisión en vivo en Canal 8 Mar del Plata.
 
-🔗 **Sitio:** [mylandingpage-one.vercel.app](https://mylandingpage-one.vercel.app)
+🔗 **Sitio:** [nicolascoudouy.com.ar](https://www.nicolascoudouy.com.ar)
 
 ![Vista previa](./public/og-image.png)
 

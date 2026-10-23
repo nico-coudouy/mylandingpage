@@ -1,57 +1,209 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+/* ───────────── Configuration ───────────── */
+
+const LIMITS = {
+  perVisitorPerDay: 10, // questions per IP per day
+  globalPerDay: 300, // questions for the whole site per day (stays well under Groq's free quota)
+  maxChars: 500, // max length of a question
+  maxHistory: 8, // messages of context sent to the model
+  maxTokens: 350, // max length of an answer
+};
+
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+
+const SYSTEM_PROMPT = `Sos el asistente del portfolio de Nico Coudouy (Nicolás Coudouy). Respondés en español rioplatense, en tono cercano y profesional, en 2 a 4 oraciones. Hablás de Nico en tercera persona.
+
+Usá solo esta información. Si te preguntan algo que no está acá, decí que no tenés ese dato y sugerí escribirle a Nico. No inventes proyectos, precios, clientes ni cifras. Si te piden algo que no tiene que ver con Nico (tareas, código, otros temas), respondé amablemente que solo podés hablar de él.
+
+PERFIL
+- Vive en Mar del Plata, Argentina. Hace desarrollo web y automatización.
+- Trabaja desde octubre de 2017 en Canal 8 Mar del Plata (9 años): cámara, dirección de cámaras, control de aire, gráfica Squid/CGX, edición y soporte IT.
+- Freelance desde 2015: edición de video, soporte IT y desarrollo web.
+- Formación: Técnico en Informática (E.E.T. N°3, 2011). Cursa la Tecnicatura en Programación en Teclab (egreso previsto en diciembre de 2027). Inglés básico técnico.
+
+PROYECTOS
+- Teleocho Informa (Canal 8): paquete gráfico animado del noticiero de las 13, generado con código (HTML Canvas, Playwright, FFmpeg). 38 piezas entregadas en 50p, con 6 fondos por sección en loops de 40 segundos, aperturas, separadores y placas.
+- Florencia Ferraro Propiedades (florenciaferraro.com.ar): web completa para una inmobiliaria de Mar del Plata, con catálogo, filtros, conversión con dólar oficial y contacto por WhatsApp. Hecha con Supabase y Vercel. Está en uso.
+- Automatizaciones para Canal 8: escáner del archivo de video en Python que arma un Excel por año (con interfaz gráfica y .exe), y conversor de rundowns de Airtable a la gráfica Squid CGX.
+- Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. En piloto con un gimnasio de Mar del Plata. Supabase y Vercel.
+- Festival Internacional de Cine de Mar del Plata: edita y anima videos para las redes del festival en las ediciones 2024, 2025 y 2026.
+- LiveRundown: proyecto en desarrollo, un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
+- Bot Pilot: chatbots con IA para Instagram, Facebook y WhatsApp. Este asistente es una demo de esa tecnología.
+
+TECNOLOGÍAS
+Python, TypeScript, JavaScript, PHP, SQL, React, Next.js, Tailwind CSS, Vite, Supabase, PostgreSQL, MySQL, Firebase, Vercel, Docker, Git, fundamentos de AWS, APIs de LLMs, Squid CGX, OBS, CasparCG, Premiere Pro y After Effects.
+
+DISPONIBILIDAD
+Busca sumarse a un equipo de Argentina o LatAm, en remoto o presencial en Mar del Plata, y toma proyectos puntuales de desarrollo web, automatización y producción audiovisual. También hace soporte IT para hogares y comercios en Mar del Plata.
+
+CONTACTO
+Email: nicocoudouy@gmail.com · WhatsApp: +54 9 223 593-7732 · LinkedIn: linkedin.com/in/nicocoudouy · GitHub: github.com/nico-coudouy
+
+PERSONAL
+Entrena CrossFit y le gusta salir a la costa con sus perros.`;
+
+/* ───────────── Rate limiting ───────────── */
+
+type Msg = { role: 'user' | 'assistant'; content: string };
+type LimitResult = { ok: boolean; remaining: number };
+
+// Upstash Redis from the Vercel Marketplace sets KV_* variables; a manual setup uses UPSTASH_*.
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+const redis = redisUrl && redisToken ? new Redis({ url: redisUrl, token: redisToken }) : null;
+
+const visitorLimiter = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.fixedWindow(LIMITS.perVisitorPerDay, '1 d'), prefix: 'chat:visitor' })
+  : null;
+const globalLimiter = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.fixedWindow(LIMITS.globalPerDay, '1 d'), prefix: 'chat:global' })
+  : null;
+
+// Fallback while Upstash is not configured: counts per server instance and resets on cold starts.
+// Good enough to stop casual abuse, not a guarantee. Configure Upstash for real limits.
+const memory = new Map<string, { count: number; resetAt: number }>();
+function memoryLimit(key: string, max: number): LimitResult {
+  const now = Date.now();
+  let entry = memory.get(key);
+  if (!entry || entry.resetAt <= now) {
+    entry = { count: 0, resetAt: now + 86_400_000 };
+    memory.set(key, entry);
+  }
+  if (entry.count >= max) return { ok: false, remaining: 0 };
+  entry.count += 1;
+  return { ok: true, remaining: max - entry.count };
+}
+
+async function checkLimits(ip: string): Promise<LimitResult & { scope: 'visitor' | 'global' }> {
+  if (visitorLimiter && globalLimiter) {
+    const visitor = await visitorLimiter.limit(ip);
+    if (!visitor.success) return { ok: false, remaining: 0, scope: 'visitor' };
+    const global = await globalLimiter.limit('site');
+    if (!global.success) return { ok: false, remaining: visitor.remaining, scope: 'global' };
+    return { ok: true, remaining: visitor.remaining, scope: 'visitor' };
+  }
+  const visitor = memoryLimit(`v:${ip}`, LIMITS.perVisitorPerDay);
+  if (!visitor.ok) return { ...visitor, scope: 'visitor' };
+  const global = memoryLimit('global', LIMITS.globalPerDay);
+  if (!global.ok) return { ok: false, remaining: visitor.remaining, scope: 'global' };
+  return { ...visitor, scope: 'visitor' };
+}
+
+/* ───────────── Helpers ───────────── */
+
+function clientIp(req: VercelRequest): string {
+  const fwd = req.headers['x-forwarded-for'];
+  const first = (Array.isArray(fwd) ? fwd[0] : fwd)?.split(',')[0]?.trim();
+  return first || (req.headers['x-real-ip'] as string) || 'unknown';
+}
+
+function allowedOrigins(): string[] {
+  const list = (process.env.ALLOWED_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean);
+  for (const host of [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]) {
+    if (host) list.push(`https://${host}`);
+  }
+  list.push('https://mylandingpage-one.vercel.app', 'http://localhost:3000', 'http://localhost:5173');
+  return list;
+}
+
+function sanitize(body: unknown): Msg[] | null {
+  const raw = (body as { messages?: unknown })?.messages;
+  if (!Array.isArray(raw)) return null;
+  const msgs = raw
+    .filter((m): m is Msg => (m?.role === 'user' || m?.role === 'assistant') && typeof m?.content === 'string')
+    .map((m) => ({ role: m.role, content: m.content.trim().slice(0, 1000) }))
+    .filter((m) => m.content.length > 0)
+    .slice(-LIMITS.maxHistory);
+  if (msgs.length === 0 || msgs[msgs.length - 1].role !== 'user') return null;
+  return msgs;
+}
+
+async function complete(url: string, key: string, model: string, messages: Msg[]): Promise<string> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      max_tokens: LIMITS.maxTokens,
+      temperature: 0.4,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) throw new Error(`${model} respondió ${res.status}: ${await res.text().catch(() => '')}`);
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (typeof text !== 'string' || !text.trim()) throw new Error(`${model} devolvió una respuesta vacía`);
+  return text.trim();
+}
+
+/** Groq first; optional OpenAI-compatible fallback (Cerebras, Gemini, etc.) via FALLBACK_* variables. */
+async function answer(messages: Msg[]): Promise<string> {
+  const errors: unknown[] = [];
+  if (process.env.GROQ_API_KEY) {
+    try {
+      return await complete(GROQ_URL, process.env.GROQ_API_KEY, GROQ_MODEL, messages);
+    } catch (e) {
+      errors.push(e);
+    }
+  }
+  const { FALLBACK_API_URL: url, FALLBACK_API_KEY: key, FALLBACK_MODEL: model } = process.env;
+  if (url && key && model) {
+    try {
+      return await complete(url, key, model, messages);
+    } catch (e) {
+      errors.push(e);
+    }
+  }
+  throw new AggregateError(errors, 'Ningún proveedor respondió');
+}
+
+/* ───────────── Handler ───────────── */
+
+const CONTACT_LINE = 'Podés escribirle a Nico a nicocoudouy@gmail.com.';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ answer: 'Método no permitido' });
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ answer: 'Método no permitido.' });
   }
 
-  const { messages } = req.body;
-  const apiKey = process.env.GROQ_API_KEY;
+  const origin = req.headers.origin;
+  if (!origin || !allowedOrigins().includes(origin)) {
+    return res.status(403).json({ answer: 'Este asistente solo responde desde el sitio de Nico.' });
+  }
 
-  if (!apiKey) {
-    return res.status(500).json({ answer: 'Error: No hay API Key configurada.' });
+  const messages = sanitize(req.body);
+  if (!messages) {
+    return res.status(400).json({ answer: 'No entendí la pregunta. ¿Podés escribirla de nuevo?' });
+  }
+  if (messages[messages.length - 1].content.length > LIMITS.maxChars) {
+    return res.status(400).json({ answer: `La pregunta es muy larga. Probá con menos de ${LIMITS.maxChars} caracteres.` });
+  }
+
+  let limit;
+  try {
+    limit = await checkLimits(clientIp(req));
+  } catch (e) {
+    console.error('Error al consultar el límite de uso', e);
+    return res.status(503).json({ answer: `El asistente no está disponible en este momento. ${CONTACT_LINE}` });
+  }
+  if (!limit.ok) {
+    const text = limit.scope === 'global'
+      ? `El asistente llegó a su límite de consultas por hoy. ${CONTACT_LINE}`
+      : `Llegaste al límite de ${LIMITS.perVisitorPerDay} preguntas por hoy. ${CONTACT_LINE}`;
+    return res.status(429).json({ answer: text, remaining: 0 });
   }
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          {
-            role: 'system',
-            content: `Sos el asistente personal de Nico. Cuando alguien pregunte sobre Nico, usá esta información:
-
-Nombre: Nico
-Ubicación: Argentina
-Trabajo: Desarrollador, trabaja con automatización, streaming, y bots de Instagram, Facebook y WhatsApp. SQL & PostgreSQL, Data Entry & Data Processing. Camera Director and Editor, +10 years in television production. Profesional con background en producción audiovisual, con experiencia en entornos de alta precisión y gestión de información, actualmente enfocado en operaciones de datos y procesamiento estructurado. Experiencia práctica en manejo de bases de datos PostgreSQL, consultas SQL, organización de información y automatización básica con Python. Perfil detallista, metódico y orientado a la calidad, con capacidad para trabajar de forma remota y cumplir objetivos en plazos establecidos.
-Proyectos: Automatización de Ventas y Atención al Cliente con ManyChat. Rediseño y migración web. Maneja infraestructura en Google Cloud.
-Intereses: Pasar tiempo con familia y sus perros, tecnología en general, entrenamiento en crossfit.
-Si preguntan por Bot Pilot: es la plataforma definitiva para integrar IA en tus canales de chat. Automatizo tus DMs para vender 24/7. Ahorra 10h/semana en respuestas manuales.
-Si preguntan por Nexco: Soporte técnico para hogares y empresas. PC, Notebooks, Redes, Datos. Me pueden contactar por whatsapp al +5492235937732. Respuesta en menos de 24hs. Presupuesto sin cargo.
-Si quieren contactarse conmigo, o sea Nico: Enviar el numero de telefono +5492235937732 o tambien por mail nicocoudouy@gmail.com
-Respondé siempre en español. Si no sabés algo sobre Nico que no está aquí, decí que no tenés esa información.`
-          },
-          ...messages
-        ],
-        max_tokens: 1024
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.error) {
-      return res.status(200).json({ answer: `Error de Groq: ${data.error.message}` });
-    }
-
-    const text = data.choices?.[0]?.message?.content;
-    return res.status(200).json({ answer: text || 'Sin respuesta del asistente.' });
-
-  } catch (error: any) {
-    return res.status(500).json({ answer: `Falla de red: ${error.message}` });
+    const text = await answer(messages);
+    return res.status(200).json({ answer: text, remaining: limit.remaining });
+  } catch (e) {
+    console.error('Error del proveedor de IA', e);
+    return res.status(502).json({ answer: `No pude responder ahora. ${CONTACT_LINE}`, remaining: limit.remaining });
   }
 }

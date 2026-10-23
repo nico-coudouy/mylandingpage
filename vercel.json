@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "mylandingpage-one.vercel.app"
+        }
+      ],
+      "destination": "https://www.nicolascoudouy.com.ar/:path*",
+      "permanent": true
+    }
+  ]
+}

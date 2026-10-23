@@ -58,7 +58,7 @@ export default function Assistant() {
           <p className="lead" style={{ margin: 0 }}>
             Responde sobre mis proyectos, mi experiencia y cómo contactarme. Usa la misma tecnología que Bot Pilot, mis chatbots para negocios.
           </p>
-          <div className="tags"><span className="tag">Groq</span><span className="tag">Llama 3.3</span><span className="tag">Vercel Functions</span></div>
+          <div className="tags"><span className="tag">Groq</span><span className="tag">GPT-OSS 120B</span><span className="tag">Vercel Functions</span></div>
         </div>
         <div>
           <div className="chat">

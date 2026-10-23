@@ -6,14 +6,18 @@ import { Redis } from '@upstash/redis';
 
 const LIMITS = {
   perVisitorPerDay: 10, // questions per IP per day
-  globalPerDay: 300, // questions for the whole site per day (stays well under Groq's free quota)
+  globalPerDay: 100, // questions for the whole site per day (Groq's free tier allows ~200k tokens/day)
   maxChars: 500, // max length of a question
   maxHistory: 8, // messages of context sent to the model
   maxTokens: 350, // max length of an answer
 };
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+// Groq retired the Llama 3.x models on 2026-08-16; gpt-oss-120b is its recommended replacement.
+const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+// Reasoning models spend tokens thinking before answering; give them headroom and keep the effort low.
+const REASONING_TOKENS = 400;
+const isReasoningModel = (model: string) => model.includes('gpt-oss');
 
 const SYSTEM_PROMPT = `Sos el asistente del portfolio de Nico Coudouy (Nicolás Coudouy). Respondés en español rioplatense, en tono cercano y profesional, en 2 a 4 oraciones. Hablás de Nico en tercera persona.
 
@@ -129,8 +133,9 @@ async function complete(url: string, key: string, model: string, messages: Msg[]
     body: JSON.stringify({
       model,
       messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-      max_tokens: LIMITS.maxTokens,
+      max_tokens: LIMITS.maxTokens + (isReasoningModel(model) ? REASONING_TOKENS : 0),
       temperature: 0.4,
+      ...(isReasoningModel(model) ? { reasoning_effort: 'low' } : {}),
     }),
     signal: AbortSignal.timeout(15_000),
   });

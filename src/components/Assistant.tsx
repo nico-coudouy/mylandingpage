@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { askAssistant, type ChatMessage } from '../lib/chat';
 import { useCopy, useLang } from '../i18n';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { tokenize } from '../lib/richText';
 
 const COPY = {
   es: {
@@ -67,12 +68,19 @@ const HISTORY_SENT = 8;
 
 type Line = { role: 'user' | 'assistant' | 'event'; content: string; time: string; local?: boolean };
 
-const EMOTICONS: Record<string, string> = {
-  ':)': '🙂', ':-)': '🙂', ';)': '😉', ';-)': '😉', ':D': '😄', ':-D': '😄', ':P': '😛', ':p': '😛',
-  ':(': '🙁', ':-(': '🙁', '<3': '❤️', '(y)': '👍', '(Y)': '👍', '(H)': '😎', '(h)': '😎',
-};
-const EMO_RE = /(^|\s)(:-?\)|;-?\)|:-?D|:[Pp]|:-?\(|<3|\([yYhH]\))(?=$|\s|[.,!?])/g;
-const emoticons = (s: string) => s.replace(EMO_RE, (_, pre: string, code: string) => pre + (EMOTICONS[code] ?? code));
+/** Renders an answer with clickable emails, sites and WhatsApp numbers. */
+function Rich({ text }: { text: string }) {
+  return (
+    <>
+      {tokenize(text).map((t, i) => {
+        const body = t.bold ? <strong>{t.text}</strong> : t.text;
+        return t.type === 'link'
+          ? <a key={i} href={t.href} {...(t.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{body}</a>
+          : <span key={i}>{body}</span>;
+      })}
+    </>
+  );
+}
 
 const clock = () => new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -214,14 +222,14 @@ export default function Assistant() {
             <div className="msn-thread" ref={threadRef} aria-live="polite">
               <div className="msn-msg">
                 <span className="who bot">{c.botSays}</span>
-                <p>{emoticons(c.greeting)}</p>
+                <p><Rich text={c.greeting} /></p>
               </div>
               {lines.map((l, k) => l.role === 'event' ? (
                 <div key={k} className="msn-event">— {l.content} —</div>
               ) : (
                 <div key={k} className="msn-msg">
                   <span className={`who ${l.role === 'user' ? 'me' : 'bot'}`}>{l.role === 'user' ? c.youSay : c.botSays}<time>{l.time}</time></span>
-                  <p>{emoticons(l.content)}</p>
+                  <p><Rich text={l.content} /></p>
                 </div>
               ))}
             </div>

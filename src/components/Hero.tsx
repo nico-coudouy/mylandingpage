@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { ArrowDown, ArrowUpRight } from './Icons';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CV_URL } from '../data/profile';
+import { useCopy } from '../i18n';
 
 /** Dot grid behind the hero that glows around the pointer. */
 function DotField() {
@@ -88,7 +89,30 @@ function useTimecode() {
   return tc;
 }
 
-function CameraMonitor() {
+const COPY = {
+  es: {
+    status: 'DISPONIBLE · MAR DEL PLATA · REMOTO AR / LATAM',
+    h1a: 'Convierto procesos manuales en ',
+    h1b: 'software que funciona.',
+    lead: 'Desarrollo web y automatización, con 9 años de experiencia en operación televisiva en vivo en Canal 8 Mar del Plata.',
+    projects: 'Ver proyectos',
+    cv: 'Descargar CV',
+    onAir: 'CAM 1 · AL AIRE',
+    alt: 'Retrato de Nico Coudouy',
+  },
+  en: {
+    status: 'AVAILABLE · MAR DEL PLATA, ARGENTINA · REMOTE',
+    h1a: 'I turn manual processes into ',
+    h1b: 'software that works.',
+    lead: 'Web development and automation, backed by 9 years of live TV operations at Canal 8 Mar del Plata.',
+    projects: 'See projects',
+    cv: 'Download CV (Spanish)',
+    onAir: 'CAM 1 · ON AIR',
+    alt: 'Portrait of Nico Coudouy',
+  },
+};
+
+function CameraMonitor({ onAir, alt }: { onAir: string; alt: string }) {
   const tc = useTimecode();
   const [focus, setFocus] = useState({ left: '50%', top: '42%' });
 
@@ -101,13 +125,13 @@ function CameraMonitor() {
   };
 
   return (
-    <figure className="cam" style={{ margin: 0 }}>
+    <figure className="cam">
       <div className="cam-top">
-        <span className="tally"><i />CAM 1 · AL AIRE</span>
+        <span className="tally"><i /><span>{onAir}</span></span>
         <span id="tc">{tc}</span>
       </div>
       <div className="cam-view" onPointerMove={onMove} onPointerLeave={() => setFocus({ left: '50%', top: '42%' })}>
-        <img src="/assets/nico.jpg" alt="Retrato de Nico Coudouy" width={640} height={641} />
+        <img src="/assets/nico.jpg" alt={alt} width={640} height={641} />
         <div className="focus" style={focus} />
       </div>
       <figcaption className="cam-bot">
@@ -119,22 +143,23 @@ function CameraMonitor() {
 }
 
 export default function Hero() {
+  const c = useCopy(COPY);
   return (
     <section className="hero" id="inicio">
       <DotField />
       <div className="wrap">
-        <div>
-          <span className="status"><i />DISPONIBLE · MAR DEL PLATA · REMOTO AR / LATAM</span>
-          <h1>Convierto procesos manuales en <em>software que funciona.</em></h1>
-          <p className="lead">
-            Desarrollo web y automatización, con 9 años de experiencia en operación televisiva en vivo en Canal 8 Mar del Plata.
-          </p>
+        <div className="hero-head">
+          <span className="status"><i />{c.status}</span>
+        </div>
+        <CameraMonitor onAir={c.onAir} alt={c.alt} />
+        <div className="hero-body">
+          <h1>{c.h1a}<em>{c.h1b}</em></h1>
+          <p className="lead">{c.lead}</p>
           <div className="ctas">
-            <a className="btn primary" href="#proyectos">Ver proyectos <ArrowDown /></a>
-            <a className="btn" href={CV_URL} target="_blank" rel="noopener">Descargar CV <ArrowUpRight /></a>
+            <a className="btn primary" href="#proyectos">{c.projects} <ArrowDown /></a>
+            <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv} <ArrowUpRight /></a>
           </div>
         </div>
-        <CameraMonitor />
       </div>
     </section>
   );

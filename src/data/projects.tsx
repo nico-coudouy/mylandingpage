@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Lang } from '../i18n';
 import AutoVideo from '../components/AutoVideo';
 import TeleochoMedia from '../components/projects/TeleochoMedia';
 import BrowserPreview from '../components/projects/BrowserPreview';
@@ -6,134 +7,218 @@ import AutomationConsole from '../components/projects/AutomationConsole';
 
 export type Category = 'web' | 'auto' | 'broadcast' | 'av';
 
-export const FILTERS: { id: Category | 'all'; label: string }[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'web', label: 'Web' },
-  { id: 'auto', label: 'Automatización' },
-  { id: 'broadcast', label: 'Broadcast' },
-  { id: 'av', label: 'Audiovisual' },
+export const FILTERS: { id: Category | 'all'; label: Record<Lang, string> }[] = [
+  { id: 'all', label: { es: 'Todos', en: 'All' } },
+  { id: 'web', label: { es: 'Web', en: 'Web' } },
+  { id: 'auto', label: { es: 'Automatización', en: 'Automation' } },
+  { id: 'broadcast', label: { es: 'Broadcast', en: 'Broadcast' } },
+  { id: 'av', label: { es: 'Audiovisual', en: 'Video' } },
 ];
 
-export type Project = {
-  id: string;
-  categories: Category[];
+type ProjectText = {
   eyebrow: string;
   title: string;
   summary: string;
   details: { label: string; text: string }[];
+  badge?: string;
+  link?: string;
+};
+
+export type Project = {
+  id: string;
+  /** Featured projects get a full-width row; the rest show as compact cards. */
+  featured: boolean;
+  categories: Category[];
   tags: string[];
+  /** Full-size media for featured rows, or a 4:3 thumbnail for compact cards. */
   media: ReactNode;
   logo?: { src: string; alt: string };
-  badge?: string;
-  link?: { href: string; label: string };
+  href?: string;
+  text: Record<Lang, ProjectText>;
 };
 
 export const PROJECTS: Project[] = [
   {
     id: 'teleocho',
+    featured: true,
     categories: ['broadcast', 'av'],
-    eyebrow: 'Gráfica broadcast · Canal 8',
-    logo: { src: '/assets/canal8.png', alt: 'Canal 8' },
-    title: 'Teleocho Informa',
-    summary: 'Paquete gráfico animado completo para el noticiero de las 13, generado con código en lugar de un programa de motion.',
-    details: [
-      { label: 'Problema', text: 'El noticiero necesitaba una identidad nueva para las pantallas de estudio y el aire, en horizontal y vertical.' },
-      { label: 'Solución', text: 'Un motor de animación en HTML y Canvas, con un renderizador por lotes que exporta cada pieza en 50p.' },
-      { label: 'Resultado', text: '38 piezas entregadas: 6 fondos por sección en loops de 40 s, aperturas, separadores y placas.' },
-    ],
     tags: ['HTML Canvas', 'JavaScript', 'Playwright', 'FFmpeg'],
     media: <TeleochoMedia />,
+    logo: { src: '/assets/canal8.png', alt: 'Canal 8' },
+    text: {
+      es: {
+        eyebrow: 'Gráfica broadcast · Canal 8',
+        title: 'Teleocho Informa',
+        summary: 'Paquete gráfico animado completo para el noticiero de las 13, generado con código en lugar de un programa de motion.',
+        details: [
+          { label: 'Problema', text: 'El noticiero necesitaba una identidad nueva para las pantallas de estudio y el aire, en horizontal y vertical.' },
+          { label: 'Solución', text: 'Un motor de animación en HTML y Canvas, con un renderizador por lotes que exporta cada pieza en 50p.' },
+          { label: 'Resultado', text: '38 piezas entregadas: 6 fondos por sección en loops de 40 s, aperturas, separadores y placas.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Broadcast graphics · Canal 8',
+        title: 'Teleocho Informa',
+        summary: 'A complete animated graphics package for the 1 p.m. newscast, generated with code instead of a motion graphics app.',
+        details: [
+          { label: 'Problem', text: 'The newscast needed a new identity for the studio screens and the on-air feed, in landscape and portrait.' },
+          { label: 'Solution', text: 'An HTML and Canvas animation engine, with a batch renderer that exports every piece at 50p.' },
+          { label: 'Result', text: '38 pieces delivered: 6 section backgrounds in 40-second loops, openers, bumpers and title cards.' },
+        ],
+      },
+    },
   },
   {
     id: 'florencia-ferraro',
+    featured: true,
     categories: ['web'],
-    eyebrow: 'Web · Cliente real',
-    title: 'Florencia Ferraro Propiedades',
-    summary: 'Web completa para una inmobiliaria de Mar del Plata, del diseño a la puesta en producción.',
-    details: [
-      { label: 'Problema', text: 'La inmobiliaria necesitaba una web propia para mostrar su cartera y recibir consultas.' },
-      { label: 'Solución', text: 'Catálogo con filtros por operación, tipo, ambientes y precio, conversión con dólar oficial y contacto directo por WhatsApp.' },
-      { label: 'Resultado', text: 'Sitio publicado y en uso por la inmobiliaria.' },
-    ],
-    tags: ['Supabase', 'Vercel', 'Diseño UI'],
+    tags: ['Supabase', 'Vercel', 'UI design'],
     media: <BrowserPreview />,
-    link: { href: 'https://www.florenciaferraro.com.ar/', label: 'Ver sitio' },
+    href: 'https://www.florenciaferraro.com.ar/',
+    text: {
+      es: {
+        eyebrow: 'Web · Cliente real',
+        title: 'Florencia Ferraro Propiedades',
+        summary: 'Web completa para una inmobiliaria de Mar del Plata, del diseño a la puesta en producción.',
+        details: [
+          { label: 'Problema', text: 'La inmobiliaria necesitaba una web propia para mostrar su cartera y recibir consultas.' },
+          { label: 'Solución', text: 'Catálogo con filtros por operación, tipo, ambientes y precio, conversión con dólar oficial y contacto directo por WhatsApp.' },
+          { label: 'Resultado', text: 'En uso: la inmobiliaria carga sola entre 5 y 10 propiedades nuevas por mes.' },
+        ],
+        link: 'Ver sitio',
+      },
+      en: {
+        eyebrow: 'Web · Real client',
+        title: 'Florencia Ferraro Propiedades',
+        summary: 'A complete website for a real estate agency in Mar del Plata, from design to production.',
+        details: [
+          { label: 'Problem', text: 'The agency needed its own website to show its listings and receive inquiries.' },
+          { label: 'Solution', text: 'A catalog filtered by deal type, property type, rooms and price, with official USD exchange conversion and direct WhatsApp contact.' },
+          { label: 'Result', text: 'In daily use: the agency adds 5 to 10 new properties a month on its own.' },
+        ],
+        link: 'Visit site',
+      },
+    },
   },
   {
     id: 'automatizaciones',
+    featured: true,
     categories: ['auto', 'broadcast'],
-    eyebrow: 'Automatización · Canal 8',
-    title: 'Herramientas para la operación del canal',
-    summary: 'Soluciones chicas para tareas que se repiten todos los días en un canal de televisión.',
-    details: [
-      { label: 'Problema', text: 'Búsquedas manuales en el archivo de video y rundowns que se cargaban a mano en la gráfica antes de cada programa.' },
-      { label: 'Solución', text: 'Scripts y apps a medida que conectan las herramientas que el canal ya usa.' },
-      { label: 'Resultado', text: 'Herramientas en uso por los equipos de archivo, producción y aire.' },
-    ],
     tags: ['Python', 'PyInstaller', 'Airtable API', 'Squid CGX'],
     media: <AutomationConsole />,
+    text: {
+      es: {
+        eyebrow: 'Automatización · Canal 8',
+        title: 'Herramientas para la operación del canal',
+        summary: 'Soluciones chicas para tareas que se repiten todos los días en un canal de televisión.',
+        details: [
+          { label: 'Problema', text: 'Búsquedas manuales en el archivo de video y rundowns que se cargaban a mano en la gráfica antes de cada programa.' },
+          { label: 'Solución', text: 'Scripts y apps a medida que conectan las herramientas que el canal ya usa.' },
+          { label: 'Resultado', text: 'El escáner del archivo le ahorra al equipo entre 4 y 6 horas por semana.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Automation · Canal 8',
+        title: 'Tools for the station’s daily operation',
+        summary: 'Small, focused tools for tasks that repeat every day at a TV station.',
+        details: [
+          { label: 'Problem', text: 'Manual searches through the video archive, and rundowns typed into the graphics system by hand before every show.' },
+          { label: 'Solution', text: 'Custom scripts and apps that connect the tools the station already uses.' },
+          { label: 'Result', text: 'The archive scanner saves the team 4 to 6 hours every week.' },
+        ],
+      },
+    },
   },
   {
     id: 'tiza',
+    featured: false,
     categories: ['web'],
-    eyebrow: 'Producto propio · Web app',
-    badge: 'PILOTO',
-    title: 'Tiza',
-    summary: 'App web para reservar clases en distintos gimnasios. Cada gimnasio tiene su marca y sus alumnos reservan en dos toques.',
-    details: [
-      { label: 'Problema', text: 'El gimnasio piloto usaba una herramienta de turnos genérica y quería una propia, con su marca.' },
-      { label: 'Solución', text: 'Plataforma para varios gimnasios, con clases con cupo, créditos con vencimiento y panel de administración.' },
-      { label: 'Resultado', text: 'En piloto con un gimnasio de Mar del Plata.' },
-    ],
     tags: ['Supabase', 'Vercel', 'GitHub'],
-    media: (
-      <div className="phones">
-        <div className="phone"><img src="/assets/tiza-inicio.jpg" alt="Tiza, elección del gimnasio" width={470} height={1016} /></div>
-        <div className="phone"><img src="/assets/tiza-reserva.jpg" alt="Tiza, clase reservada" width={470} height={1016} /></div>
-      </div>
-    ),
+    media: <img src="/assets/tiza-thumb.jpg" alt="Tiza" width={1200} height={900} loading="lazy" />,
+    text: {
+      es: {
+        eyebrow: 'Producto propio · Web app',
+        badge: 'PILOTO',
+        title: 'Tiza',
+        summary: 'App web para reservar clases en distintos gimnasios. Cada gimnasio tiene su marca y sus alumnos reservan en dos toques.',
+        details: [
+          { label: 'Problema', text: 'El gimnasio piloto usaba una herramienta de turnos genérica y quería una propia, con su marca.' },
+          { label: 'Solución', text: 'Plataforma para varios gimnasios, con clases con cupo, créditos con vencimiento y panel de administración.' },
+          { label: 'Resultado', text: 'En piloto con un gimnasio de Mar del Plata.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Own product · Web app',
+        badge: 'PILOT',
+        title: 'Tiza',
+        summary: 'A web app to book classes at different gyms. Each gym keeps its own brand, and members book in two taps.',
+        details: [
+          { label: 'Problem', text: 'The pilot gym used a generic booking tool and wanted its own, under its brand.' },
+          { label: 'Solution', text: 'A multi-gym platform with capped classes, expiring credits and an admin panel.' },
+          { label: 'Result', text: 'Running as a pilot with a gym in Mar del Plata.' },
+        ],
+      },
+    },
   },
   {
     id: 'festival',
+    featured: false,
     categories: ['av'],
-    eyebrow: 'Edición audiovisual',
-    title: 'Festival Internacional de Cine de Mar del Plata',
-    summary: 'Edición y animación de videos para las redes del festival en tres ediciones seguidas.',
-    details: [
-      { label: 'Qué hago', text: 'Reels de feed e historias de las actividades del festival.' },
-      { label: 'Formatos', text: 'Edición del video de feed y su adaptación a formato historia, con gráfica animada.' },
-    ],
     tags: ['Premiere Pro', 'After Effects', 'Motion graphics'],
     media: (
-      <div className="fest">
-        <div className="phone">
-          <AutoVideo src="/assets/festival.mp4" poster="/assets/festival.jpg" label="Fragmento de un reel del festival" />
-        </div>
-        <div className="eds" aria-label="Ediciones">
-          <div className="ed"><b>2024</b><span>39° FESTIVAL</span></div>
-          <div className="ed"><b>2025</b><span>40° FESTIVAL</span></div>
-          <div className="ed now"><b>2026</b><span>41° FESTIVAL</span></div>
-        </div>
-      </div>
+      <>
+        <AutoVideo src="/assets/festival.mp4" poster="/assets/festival.jpg" label="Mar del Plata International Film Festival" />
+        <span className="mini-over">2024 · 2025 · 2026</span>
+      </>
     ),
+    text: {
+      es: {
+        eyebrow: 'Edición audiovisual',
+        title: 'Festival Internacional de Cine de Mar del Plata',
+        summary: 'Edición y animación de videos para las redes del festival en tres ediciones seguidas: 2024, 2025 y 2026.',
+        details: [
+          { label: 'Qué hago', text: 'Reels de feed e historias de las actividades del festival.' },
+          { label: 'Formatos', text: 'Edición del video de feed y su adaptación a formato historia, con gráfica animada.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Video editing',
+        title: 'Mar del Plata International Film Festival',
+        summary: 'Video editing and animation for the festival’s social media, three editions in a row: 2024, 2025 and 2026.',
+        details: [
+          { label: 'What I do', text: 'Feed reels and stories covering the festival’s events.' },
+          { label: 'Formats', text: 'Editing the feed video and adapting it to the story format, with animated graphics.' },
+        ],
+      },
+    },
   },
   {
     id: 'liverundown',
+    featured: false,
     categories: ['broadcast', 'web'],
-    eyebrow: 'Broadcast · Web app',
-    badge: 'PROYECTO EN DESARROLLO',
-    title: 'LiveRundown',
-    summary: 'Proyecto en etapa de prototipo: un rundown de televisión en tiempo real, con una vista distinta para cada rol del programa.',
-    details: [
-      { label: 'La idea', text: 'En un programa en vivo, dirección, operación, producción y talento necesitan ver el mismo rundown actualizado al segundo.' },
-      { label: 'En qué está', text: 'Base del proyecto armada: sincronización en tiempo real y primeras integraciones con OSC, OBS WebSocket y webhooks.' },
-    ],
     tags: ['React', 'Supabase Realtime', 'OSC', 'OBS WebSocket'],
-    media: (
-      <div className="panel illus">
-        <img src="/assets/liverundown.jpg" alt="Interfaz de referencia de LiveRundown" width={1074} height={918} />
-        <span className="badge wip"><i />PROTOTIPO · VISTA ILUSTRATIVA</span>
-      </div>
-    ),
+    media: <img src="/assets/liverundown.jpg" alt="LiveRundown" width={1074} height={918} loading="lazy" />,
+    text: {
+      es: {
+        eyebrow: 'Broadcast · Web app',
+        badge: 'EN DESARROLLO',
+        title: 'LiveRundown',
+        summary: 'Proyecto en etapa de prototipo: un rundown de televisión en tiempo real, con una vista distinta para cada rol del programa.',
+        details: [
+          { label: 'La idea', text: 'En un programa en vivo, dirección, operación, producción y talento necesitan ver el mismo rundown actualizado al segundo.' },
+          { label: 'En qué está', text: 'Base del proyecto armada: sincronización en tiempo real y primeras integraciones con OSC, OBS WebSocket y webhooks. La imagen es ilustrativa.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Broadcast · Web app',
+        badge: 'IN DEVELOPMENT',
+        title: 'LiveRundown',
+        summary: 'A prototype-stage project: a real-time TV rundown with a different view for each role on the show.',
+        details: [
+          { label: 'The idea', text: 'During a live show, the director, operators, producers and talent all need the same rundown, updated to the second.' },
+          { label: 'Status', text: 'Project foundation in place: real-time sync and first integrations with OSC, OBS WebSocket and webhooks. The image is illustrative.' },
+        ],
+      },
+    },
   },
 ];

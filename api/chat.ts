@@ -31,8 +31,8 @@ PERFIL
 
 PROYECTOS
 - Teleocho Informa (Canal 8): paquete gráfico animado del noticiero de las 13, generado con código (HTML Canvas, Playwright, FFmpeg). 38 piezas entregadas en 50p, con 6 fondos por sección en loops de 40 segundos, aperturas, separadores y placas.
-- Florencia Ferraro Propiedades (florenciaferraro.com.ar): web completa para una inmobiliaria de Mar del Plata, con catálogo, filtros, conversión con dólar oficial y contacto por WhatsApp. Hecha con Supabase y Vercel. Está en uso.
-- Automatizaciones para Canal 8: escáner del archivo de video en Python que arma un Excel por año (con interfaz gráfica y .exe), y conversor de rundowns de Airtable a la gráfica Squid CGX.
+- Florencia Ferraro Propiedades (florenciaferraro.com.ar): web completa para una inmobiliaria de Mar del Plata, con catálogo, filtros, conversión con dólar oficial y contacto por WhatsApp. Hecha con Supabase y Vercel. Está en uso: la inmobiliaria carga sola entre 5 y 10 propiedades nuevas por mes.
+- Automatizaciones para Canal 8: escáner del archivo de video en Python (con interfaz gráfica y .exe). El archivo se guarda en discos y el escáner arma un Excel que indica en qué disco está cada clip; antes la búsqueda era manual. Le ahorra al equipo entre 4 y 6 horas por semana. También hizo un conversor de rundowns de Airtable a la gráfica Squid CGX.
 - Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. En piloto con un gimnasio de Mar del Plata. Supabase y Vercel.
 - Festival Internacional de Cine de Mar del Plata: edita y anima videos para las redes del festival en las ediciones 2024, 2025 y 2026.
 - LiveRundown: proyecto en desarrollo, un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
@@ -50,8 +50,14 @@ Email: nicocoudouy@gmail.com · WhatsApp: +54 9 223 593-7732 · LinkedIn: linked
 PERSONAL
 Entrena CrossFit y le gusta salir a la costa con sus perros.`;
 
+const LANG_INSTRUCTION = {
+  es: '',
+  en: '\n\nIMPORTANT: The visitor is browsing the English version of the site. Answer in clear, natural English.',
+};
+
 /* ───────────── Rate limiting ───────────── */
 
+type Lang = 'es' | 'en';
 type Msg = { role: 'user' | 'assistant'; content: string };
 type LimitResult = { ok: boolean; remaining: number };
 
@@ -132,13 +138,13 @@ function sanitize(body: unknown): Msg[] | null {
   return msgs;
 }
 
-async function complete(url: string, key: string, model: string, messages: Msg[]): Promise<string> {
+async function complete(url: string, key: string, model: string, messages: Msg[], lang: Lang): Promise<string> {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
       model,
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      messages: [{ role: 'system', content: SYSTEM_PROMPT + LANG_INSTRUCTION[lang] }, ...messages],
       max_tokens: LIMITS.maxTokens + (isReasoningModel(model) ? REASONING_TOKENS : 0),
       temperature: 0.4,
       ...(isReasoningModel(model) ? { reasoning_effort: 'low' } : {}),
@@ -153,11 +159,11 @@ async function complete(url: string, key: string, model: string, messages: Msg[]
 }
 
 /** Groq first; optional OpenAI-compatible fallback (Cerebras, Gemini, etc.) via FALLBACK_* variables. */
-async function answer(messages: Msg[]): Promise<string> {
+async function answer(messages: Msg[], lang: Lang): Promise<string> {
   const errors: unknown[] = [];
   if (process.env.GROQ_API_KEY) {
     try {
-      return await complete(GROQ_URL, process.env.GROQ_API_KEY, GROQ_MODEL, messages);
+      return await complete(GROQ_URL, process.env.GROQ_API_KEY, GROQ_MODEL, messages, lang);
     } catch (e) {
       errors.push(e);
     }
@@ -165,7 +171,7 @@ async function answer(messages: Msg[]): Promise<string> {
   const { FALLBACK_API_URL: url, FALLBACK_API_KEY: key, FALLBACK_MODEL: model } = process.env;
   if (url && key && model) {
     try {
-      return await complete(url, key, model, messages);
+      return await complete(url, key, model, messages, lang);
     } catch (e) {
       errors.push(e);
     }
@@ -175,25 +181,51 @@ async function answer(messages: Msg[]): Promise<string> {
 
 /* ───────────── Handler ───────────── */
 
-const CONTACT_LINE = 'Podés escribirle a Nico a nicocoudouy@gmail.com.';
+const TEXT = {
+  es: {
+    method: 'Método no permitido.',
+    origin: 'Este asistente solo responde desde el sitio de Nico.',
+    invalid: 'No entendí la pregunta. ¿Podés escribirla de nuevo?',
+    tooLong: `La pregunta es muy larga. Probá con menos de ${LIMITS.maxChars} caracteres.`,
+    unavailable: 'El asistente no está disponible en este momento.',
+    globalLimit: 'El asistente llegó a su límite de consultas por hoy.',
+    visitorLimit: `Llegaste al límite de ${LIMITS.perVisitorPerDay} preguntas por hoy.`,
+    failed: 'No pude responder ahora.',
+    contact: 'Podés escribirle a Nico a nicocoudouy@gmail.com.',
+  },
+  en: {
+    method: 'Method not allowed.',
+    origin: "This assistant only answers from Nico's website.",
+    invalid: "I didn't understand the question. Could you try again?",
+    tooLong: `That question is too long. Please keep it under ${LIMITS.maxChars} characters.`,
+    unavailable: 'The assistant is not available right now.',
+    globalLimit: 'The assistant has reached its daily limit.',
+    visitorLimit: `You've reached the limit of ${LIMITS.perVisitorPerDay} questions for today.`,
+    failed: "I couldn't answer right now.",
+    contact: 'You can email Nico at nicocoudouy@gmail.com.',
+  },
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const lang: Lang = (req.body as { lang?: unknown })?.lang === 'en' ? 'en' : 'es';
+  const t = TEXT[lang];
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ answer: 'Método no permitido.' });
+    return res.status(405).json({ answer: t.method });
   }
 
   const origin = req.headers.origin;
   if (!origin || !allowedOrigins().includes(origin)) {
-    return res.status(403).json({ answer: 'Este asistente solo responde desde el sitio de Nico.' });
+    return res.status(403).json({ answer: t.origin });
   }
 
   const messages = sanitize(req.body);
   if (!messages) {
-    return res.status(400).json({ answer: 'No entendí la pregunta. ¿Podés escribirla de nuevo?' });
+    return res.status(400).json({ answer: t.invalid });
   }
   if (messages[messages.length - 1].content.length > LIMITS.maxChars) {
-    return res.status(400).json({ answer: `La pregunta es muy larga. Probá con menos de ${LIMITS.maxChars} caracteres.` });
+    return res.status(400).json({ answer: t.tooLong });
   }
 
   let limit;
@@ -201,20 +233,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     limit = await checkLimits(clientIp(req));
   } catch (e) {
     console.error('Error al consultar el límite de uso', e);
-    return res.status(503).json({ answer: `El asistente no está disponible en este momento. ${CONTACT_LINE}` });
+    return res.status(503).json({ answer: `${t.unavailable} ${t.contact}` });
   }
   if (!limit.ok) {
-    const text = limit.scope === 'global'
-      ? `El asistente llegó a su límite de consultas por hoy. ${CONTACT_LINE}`
-      : `Llegaste al límite de ${LIMITS.perVisitorPerDay} preguntas por hoy. ${CONTACT_LINE}`;
-    return res.status(429).json({ answer: text, remaining: 0 });
+    const text = limit.scope === 'global' ? t.globalLimit : t.visitorLimit;
+    return res.status(429).json({ answer: `${text} ${t.contact}`, remaining: 0 });
   }
 
   try {
-    const text = await answer(messages);
+    const text = await answer(messages, lang);
     return res.status(200).json({ answer: text, remaining: limit.remaining });
   } catch (e) {
     console.error('Error del proveedor de IA', e);
-    return res.status(502).json({ answer: `No pude responder ahora. ${CONTACT_LINE}`, remaining: limit.remaining });
+    return res.status(502).json({ answer: `${t.failed} ${t.contact}`, remaining: limit.remaining });
   }
 }

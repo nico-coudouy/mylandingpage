@@ -297,3 +297,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 .mini-case .tags{margin-top:auto;padding-top:4px}
 @media (max-width:980px){.mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){.mini-grid{grid-template-columns:1fr}}
+
+/* screenshots and vertical videos in cards */
+.term-shot{display:block;width:100%;height:auto;margin-top:16px;border-radius:10px;border:1px solid var(--line)}
+.mini-media img.top{object-position:top}
+.vert-wrap{position:absolute;inset:0;display:flex;justify-content:center;align-items:stretch;background-size:cover;background-position:center}
+.vert-wrap::before{content:"";position:absolute;inset:0;background:rgba(6,8,13,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.mini-media .vert-wrap video{position:relative;flex:none;width:auto;height:100%;aspect-ratio:9/16;object-fit:cover;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.mini-link{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font:500 13px var(--mono);letter-spacing:.06em;color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px}
+.mini-link:hover{border-color:var(--fg)}

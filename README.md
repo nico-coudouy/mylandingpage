@@ -14,7 +14,9 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
   - Teleocho Informa (Canal 8): paquete gráfico del noticiero generado con código.
   - Florencia Ferraro Propiedades: web para una inmobiliaria.
   - Automatizaciones para Canal 8: escáner del archivo de video y rundowns de Airtable a Squid CGX.
+  - Conversor Profesional: app de escritorio en Python para convertir videos en lote ([código](https://github.com/nico-coudouy/conversor-profesional)).
   - Tiza: app de reservas para gimnasios.
+  - Video con drone de una propiedad en Camet Norte para Florencia Ferraro Propiedades.
   - Festival Internacional de Cine de Mar del Plata: edición para redes.
   - LiveRundown: proyecto en desarrollo.
 - **Asistente con IA:** chat que responde sobre mi perfil con GPT-OSS 120B vía Groq, con límite de uso por visitante y por día.

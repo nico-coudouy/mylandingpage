@@ -33,6 +33,9 @@ PROYECTOS
 - Teleocho Informa (Canal 8): paquete gráfico animado del noticiero de las 13, generado con código (HTML Canvas, Playwright, FFmpeg). 38 piezas entregadas en 50p, con 6 fondos por sección en loops de 40 segundos, aperturas, separadores y placas.
 - Florencia Ferraro Propiedades (florenciaferraro.com.ar): web completa para una inmobiliaria de Mar del Plata, con catálogo, filtros, conversión con dólar oficial y contacto por WhatsApp. Hecha con Supabase y Vercel. Está en uso: la inmobiliaria carga sola entre 5 y 10 propiedades nuevas por mes.
 - Automatizaciones para Canal 8: escáner del archivo de video en Python (con interfaz gráfica y .exe). El archivo se guarda en discos y el escáner arma un Excel que indica en qué disco está cada clip; antes la búsqueda era manual. Le ahorra al equipo entre 4 y 6 horas por semana. También hizo un conversor de rundowns de Airtable a la gráfica Squid CGX.
+- Conversor Profesional (github.com/nico-coudouy/conversor-profesional): app de escritorio en Python con PySide6 que convierte videos en lote a MP4 con FFmpeg, con presets de calidad, progreso, cancelación y .exe portable.
+- Video de una propiedad en Camet Norte para Florencia Ferraro Propiedades: filmó con drone y editó el video.
+- Redactó el protocolo de producción audiovisual y gestión de activos de Canal 8.
 - Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. En piloto con un gimnasio de Mar del Plata. Supabase y Vercel.
 - Festival Internacional de Cine de Mar del Plata: edita y anima videos para las redes del festival en las ediciones 2024, 2025 y 2026.
 - LiveRundown: proyecto en desarrollo, un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).

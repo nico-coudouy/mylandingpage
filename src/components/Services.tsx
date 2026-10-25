@@ -14,8 +14,14 @@ const COPY = {
       {
         title: 'Producción audiovisual y motion',
         text: 'Edición para redes, gráfica animada y piezas para televisión, con criterio de quien trabaja en el aire.',
-        items: ['Edición de reels e historias', 'Motion graphics y animación', 'Gráfica broadcast para noticieros', 'Cámara y dirección de cámaras'],
+        items: ['Edición de reels e historias', 'Motion graphics y animación', 'Gráfica broadcast para noticieros', 'Cámara, dirección y streaming de eventos'],
       },
+    ],
+    liveTitle: 'Eventos y streaming en vivo',
+    liveText: 'Cámaras, switcher y transmisión para charlas, eventos y programas, con la experiencia de un control de TV.',
+    livePhotos: [
+      { src: '/assets/foto-evento.webp', w: 900, h: 785, alt: 'Nico operando el switcher y la transmisión en un evento en vivo' },
+      { src: '/assets/foto-streaming.webp', w: 900, h: 1200, alt: 'Streaming en un estudio con chroma, cámaras y switcher' },
     ],
     also: 'También:',
     alsoText: 'soporte IT para hogares y comercios en Mar del Plata, con PC, notebooks y redes.',
@@ -33,8 +39,14 @@ const COPY = {
       {
         title: 'Video production and motion',
         text: 'Social media editing, animated graphics and TV pieces, with the judgment of someone who works on air.',
-        items: ['Reels and stories editing', 'Motion graphics and animation', 'Broadcast graphics for newscasts', 'Camera operation and directing'],
+        items: ['Reels and stories editing', 'Motion graphics and animation', 'Broadcast graphics for newscasts', 'Camera, directing and event streaming'],
       },
+    ],
+    liveTitle: 'Live events and streaming',
+    liveText: 'Cameras, switching and streaming for talks, events and shows, run with TV control-room experience.',
+    livePhotos: [
+      { src: '/assets/foto-evento.webp', w: 900, h: 785, alt: 'Nico running the switcher and stream at a live event' },
+      { src: '/assets/foto-streaming.webp', w: 900, h: 1200, alt: 'Studio stream with green screen, cameras and switcher' },
     ],
     also: 'Also:',
     alsoText: 'IT support for homes and small businesses in Mar del Plata: PCs, laptops and networks.',
@@ -61,6 +73,15 @@ export default function Services() {
               <p>{s.text}</p>
               <ul>{s.items.map((item) => <li key={item}>{item}</li>)}</ul>
             </div>
+          ))}
+        </div>
+        <div className="svc-live">
+          <div className="svc-live-text">
+            <h3>{c.liveTitle}</h3>
+            <p>{c.liveText}</p>
+          </div>
+          {c.livePhotos.map((p) => (
+            <img key={p.src} src={p.src} alt={p.alt} width={p.w} height={p.h} loading="lazy" decoding="async" />
           ))}
         </div>
         <div className="svc-alt">

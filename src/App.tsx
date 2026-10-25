@@ -5,6 +5,7 @@ import Reel from './components/Reel';
 import Services from './components/Services';
 import Assistant from './components/Assistant';
 import About from './components/About';
+import Team from './components/Team';
 import Contact from './components/Contact';
 import { useCopy } from './i18n';
 
@@ -50,6 +51,7 @@ export default function App() {
         <Services />
         <Assistant />
         <About />
+        <Team />
         <Contact />
       </main>
       <footer>

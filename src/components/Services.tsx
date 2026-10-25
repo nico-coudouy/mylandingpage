@@ -18,9 +18,12 @@ const COPY = {
       },
     ],
     liveTitle: 'Eventos y streaming en vivo',
-    liveText: 'Cámaras, switcher y transmisión para charlas, eventos y programas, con la experiencia de un control de TV.',
+    liveText: 'Cámaras, switcher y transmisión para charlas, eventos, shows y producciones en estudio, con la experiencia de un control de TV.',
     livePhotos: [
       { src: '/assets/foto-evento.webp', w: 900, h: 785, alt: 'Nico operando el switcher y la transmisión en un evento en vivo' },
+      { src: '/assets/evento-fundacion.webp', w: 900, h: 1200, alt: 'Cámara y monitor registrando una conferencia de Fundación Global' },
+      { src: '/assets/evento-estudio.webp', w: 900, h: 1200, alt: 'Producción en estudio con fondo blanco, luces y monitor de cámara' },
+      { src: '/assets/evento-show.webp', w: 900, h: 1200, alt: 'Cámara registrando un show en vivo de una banda' },
       { src: '/assets/foto-streaming.webp', w: 900, h: 1200, alt: 'Streaming en un estudio con chroma, cámaras y switcher' },
     ],
     also: 'También:',
@@ -43,9 +46,12 @@ const COPY = {
       },
     ],
     liveTitle: 'Live events and streaming',
-    liveText: 'Cameras, switching and streaming for talks, events and shows, run with TV control-room experience.',
+    liveText: 'Cameras, switching and streaming for talks, events, gigs and studio shoots, run with TV control-room experience.',
     livePhotos: [
       { src: '/assets/foto-evento.webp', w: 900, h: 785, alt: 'Nico running the switcher and stream at a live event' },
+      { src: '/assets/evento-fundacion.webp', w: 900, h: 1200, alt: 'Camera and monitor recording a Fundación Global conference' },
+      { src: '/assets/evento-estudio.webp', w: 900, h: 1200, alt: 'White-backdrop studio shoot with lights and a camera monitor' },
+      { src: '/assets/evento-show.webp', w: 900, h: 1200, alt: 'Camera recording a band playing live' },
       { src: '/assets/foto-streaming.webp', w: 900, h: 1200, alt: 'Studio stream with green screen, cameras and switcher' },
     ],
     also: 'Also:',
@@ -80,9 +86,11 @@ export default function Services() {
             <h3>{c.liveTitle}</h3>
             <p>{c.liveText}</p>
           </div>
-          {c.livePhotos.map((p) => (
-            <img key={p.src} src={p.src} alt={p.alt} width={p.w} height={p.h} loading="lazy" decoding="async" />
-          ))}
+          <div className="svc-live-photos">
+            {c.livePhotos.map((p) => (
+              <img key={p.src} src={p.src} alt={p.alt} width={p.w} height={p.h} loading="lazy" decoding="async" />
+            ))}
+          </div>
         </div>
         <div className="svc-alt">
           <span><b>{c.also}</b> {c.alsoText}</span>

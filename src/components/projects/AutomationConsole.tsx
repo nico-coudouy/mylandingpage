@@ -1,8 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useLang } from '../../i18n';
 
-const TOOLS = [
+type Shot = { src: string; width: number; height: number; alt: { es: string; en: string } };
+
+const TOOLS: {
+  name: { es: string; en: string };
+  meta: string;
+  cmd: string;
+  ok: { es: string; en: string };
+  desc: { es: string; en: string };
+  image?: Shot;
+}[] = [
   {
     name: { es: 'Escáner del archivo', en: 'Archive scanner' },
     meta: 'PYTHON · EXCEL',
@@ -22,9 +31,33 @@ const TOOLS = [
       es: 'Toma el rundown del programa desde Airtable por API y lo convierte al formato del importador de Squid CGX, para que los zócalos estén listos antes de salir al aire.',
       en: "Pulls the show's rundown from Airtable through its API and converts it to the Squid CGX importer format, so the lower thirds are ready before going on air.",
     },
-    image: { src: '/assets/squid.jpg', alt: { es: 'Conversor de rundowns de Airtable a Squid con la vista previa de los zócalos', en: 'Airtable to Squid rundown converter with the lower-third preview' } },
+    image: {
+      src: '/assets/squid.jpg',
+      width: 1180,
+      height: 740,
+      alt: { es: 'Conversor de rundowns de Airtable a Squid con la vista previa de los zócalos', en: 'Airtable to Squid rundown converter with the lower-third preview' },
+    },
   },
 ];
+
+/** Screenshot that opens full size in a modal dialog. */
+function Zoomable({ shot, lang }: { shot: Shot; lang: 'es' | 'en' }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const label = lang === 'es' ? 'Ampliar captura' : 'Enlarge screenshot';
+  const close = lang === 'es' ? 'Cerrar' : 'Close';
+  return (
+    <>
+      <button type="button" className="shot" onClick={() => dialog.current?.showModal()} aria-label={`${label}: ${shot.alt[lang]}`}>
+        <img src={shot.src} alt={shot.alt[lang]} width={shot.width} height={shot.height} loading="lazy" />
+        <span className="shot-hint" aria-hidden="true">{label} ⤢</span>
+      </button>
+      <dialog ref={dialog} className="lightbox" onClick={() => dialog.current?.close()} aria-label={shot.alt[lang]}>
+        <img src={shot.src} alt={shot.alt[lang]} width={shot.width} height={shot.height} />
+        <button type="button" className="lightbox-close" aria-label={close}>✕</button>
+      </dialog>
+    </>
+  );
+}
 
 export default function AutomationConsole() {
   const { lang } = useLang();
@@ -65,12 +98,10 @@ export default function AutomationConsole() {
           <>
             <div className="ok">{tool.ok[lang]}</div>
             <p>{tool.desc[lang]}</p>
-            {'image' in tool && tool.image && (
-              <img className="term-shot" src={tool.image.src} alt={tool.image.alt[lang]} width={1180} height={740} loading="lazy" />
-            )}
           </>
         )}
       </div>
+      {tool.image && <div className="console-shot"><Zoomable shot={tool.image} lang={lang} /></div>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
+import Reel from './components/Reel';
 import Services from './components/Services';
 import Assistant from './components/Assistant';
 import About from './components/About';
@@ -44,6 +45,7 @@ export default function App() {
             ))}
           </div>
         </section>
+        <Reel />
         <Projects />
         <Services />
         <Assistant />

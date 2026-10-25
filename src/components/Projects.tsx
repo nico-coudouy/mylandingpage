@@ -35,6 +35,7 @@ function FeaturedCase({ p }: { p: Project }) {
         </div>
         <h3>{t.title}</h3>
         <p className="sum">{t.summary}</p>
+        {p.extra}
         <Details items={t.details} />
         <Tags tags={p.tags} />
         {p.href && t.link && (

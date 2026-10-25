@@ -36,9 +36,9 @@ PROYECTOS
 - Conversor Profesional (github.com/nico-coudouy/conversor-profesional): app de escritorio en Python con PySide6 que convierte videos en lote a MP4 con FFmpeg, con presets de calidad, progreso, cancelación y .exe portable.
 - Video de una propiedad en Camet Norte para Florencia Ferraro Propiedades: filmó con drone y editó el video.
 - Redactó el protocolo de producción audiovisual y gestión de activos de Canal 8.
-- Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. En piloto con un gimnasio de Mar del Plata. Supabase y Vercel.
+- Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. Está en etapa de piloto con un gimnasio de Mar del Plata: nunca digas que está en producción ni que la usan varios gimnasios. Supabase y Vercel.
 - Festival Internacional de Cine de Mar del Plata: edita y anima videos para las redes del festival en las ediciones 2024, 2025 y 2026.
-- LiveRundown: proyecto en desarrollo, un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
+- LiveRundown: proyecto en desarrollo (no está en uso), un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
 - Bot Pilot: chatbots con IA para Instagram, Facebook y WhatsApp. Este asistente es una demo de esa tecnología.
 
 TECNOLOGÍAS

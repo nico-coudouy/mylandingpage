@@ -4,7 +4,7 @@ const COPY = {
   es: {
     eyebrow: 'Sobre mí',
     title: 'De la cámara al código.',
-    p1: 'Soy técnico en informática y trabajo hace 9 años en Canal 8 Mar del Plata. Empecé en cámara y hoy también dirijo cámaras, opero el control de aire y la gráfica, edito y doy soporte IT.',
+    p1: 'Soy técnico en informática y trabajo hace 9 años en Canal 8 Mar del Plata. Empecé en cámara y hoy también dirijo cámaras, opero el control de aire y la gráfica, edito y doy soporte IT. También redacté el protocolo de producción audiovisual y gestión de activos del canal.',
     p2: 'En un canal en vivo los problemas se resuelven en el momento. Ahí empecé a armar mis propias herramientas para automatizar lo que se repetía, y eso es lo que hago hoy con software: entiendo el problema operativo desde adentro y construyo la solución.',
     p3: 'Busco sumarme a un equipo de Argentina o LatAm para crecer en desarrollo de software, automatización y datos. Fuera del trabajo entreno CrossFit y salgo a la costa con mis perros.',
     skills: [
@@ -26,7 +26,7 @@ const COPY = {
   en: {
     eyebrow: 'About',
     title: 'From the camera to the code.',
-    p1: "I'm an IT technician and I've worked at Canal 8 Mar del Plata for 9 years. I started on camera, and today I also direct cameras, run the control room and the on-air graphics, edit video and handle IT support.",
+    p1: "I'm an IT technician and I've worked at Canal 8 Mar del Plata for 9 years. I started on camera, and today I also direct cameras, run the control room and the on-air graphics, edit video and handle IT support. I also wrote the station's audiovisual production and media asset management protocol.",
     p2: 'At a live TV station, problems get solved on the spot. That is where I started building my own tools to automate repetitive work, and it is what I do now with software: I understand the operational problem from the inside and build the solution.',
     p3: "I'm looking to join a team in Argentina or Latin America to grow in software development, automation and data. Outside work I do CrossFit and walk my dogs along the coast.",
     skills: [

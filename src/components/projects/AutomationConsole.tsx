@@ -22,6 +22,7 @@ const TOOLS = [
       es: 'Toma el rundown del programa desde Airtable por API y lo convierte al formato del importador de Squid CGX, para que los zócalos estén listos antes de salir al aire.',
       en: "Pulls the show's rundown from Airtable through its API and converts it to the Squid CGX importer format, so the lower thirds are ready before going on air.",
     },
+    image: { src: '/assets/squid.jpg', alt: { es: 'Conversor de rundowns de Airtable a Squid con la vista previa de los zócalos', en: 'Airtable to Squid rundown converter with the lower-third preview' } },
   },
 ];
 
@@ -64,6 +65,9 @@ export default function AutomationConsole() {
           <>
             <div className="ok">{tool.ok[lang]}</div>
             <p>{tool.desc[lang]}</p>
+            {'image' in tool && tool.image && (
+              <img className="term-shot" src={tool.image.src} alt={tool.image.alt[lang]} width={1180} height={740} loading="lazy" />
+            )}
           </>
         )}
       </div>

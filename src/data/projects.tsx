@@ -37,6 +37,15 @@ export type Project = {
   text: Record<Lang, ProjectText>;
 };
 
+/** Vertical video centered over a blurred copy of its poster, for 4:3 card thumbnails. */
+function VerticalVideo({ name, label }: { name: string; label: string }) {
+  return (
+    <div className="vert-wrap" style={{ backgroundImage: `url(/assets/${name}.jpg)` }}>
+      <AutoVideo src={`/assets/${name}.mp4`} poster={`/assets/${name}.jpg`} label={label} />
+    </div>
+  );
+}
+
 export const PROJECTS: Project[] = [
   {
     id: 'teleocho',
@@ -130,6 +139,36 @@ export const PROJECTS: Project[] = [
     },
   },
   {
+    id: 'conversor',
+    featured: false,
+    categories: ['auto'],
+    tags: ['Python', 'PySide6', 'FFmpeg', 'PyInstaller'],
+    media: <img className="top" src="/assets/conversor.png" alt="Conversor Profesional" width={745} height={729} loading="lazy" />,
+    href: 'https://github.com/nico-coudouy/conversor-profesional',
+    text: {
+      es: {
+        eyebrow: 'Software · App de escritorio',
+        title: 'Conversor Profesional',
+        summary: 'App de escritorio para convertir videos en lote a MP4 con FFmpeg: arrastrás los archivos, elegís la calidad y listo.',
+        details: [
+          { label: 'Qué hace', text: 'Conversión en lote con 4 presets de calidad, progreso por archivo y total, cancelación y descarga desde links.' },
+          { label: 'Cómo', text: 'Interfaz en PySide6 y conversión en un hilo aparte para que la app no se trabe. Se distribuye como .exe portable con FFmpeg incluido.' },
+        ],
+        link: 'Ver código',
+      },
+      en: {
+        eyebrow: 'Software · Desktop app',
+        title: 'Conversor Profesional',
+        summary: 'A desktop app that batch-converts videos to MP4 with FFmpeg: drop the files, pick a quality preset, done.',
+        details: [
+          { label: 'Features', text: 'Batch conversion with 4 quality presets, per-file and overall progress, cancel, and download from links.' },
+          { label: 'How', text: 'PySide6 interface with conversion on a separate thread so the app never freezes. Ships as a portable .exe with FFmpeg bundled.' },
+        ],
+        link: 'View code',
+      },
+    },
+  },
+  {
     id: 'tiza',
     featured: false,
     categories: ['web'],
@@ -167,7 +206,7 @@ export const PROJECTS: Project[] = [
     tags: ['Premiere Pro', 'After Effects', 'Motion graphics'],
     media: (
       <>
-        <AutoVideo src="/assets/festival.mp4" poster="/assets/festival.jpg" label="Mar del Plata International Film Festival" />
+        <VerticalVideo name="festival" label="Mar del Plata International Film Festival" />
         <span className="mini-over">2024 · 2025 · 2026</span>
       </>
     ),
@@ -188,6 +227,33 @@ export const PROJECTS: Project[] = [
         details: [
           { label: 'What I do', text: 'Feed reels and stories covering the festival’s events.' },
           { label: 'Formats', text: 'Editing the feed video and adapting it to the story format, with animated graphics.' },
+        ],
+      },
+    },
+  },
+  {
+    id: 'camet-norte',
+    featured: false,
+    categories: ['av'],
+    tags: ['Drone DJI', 'Premiere Pro', 'Edición'],
+    media: <VerticalVideo name="camet-norte" label="Chalet en Camet Norte" />,
+    text: {
+      es: {
+        eyebrow: 'Video · Drone',
+        title: 'Chalet en Camet Norte',
+        summary: 'Video de una propiedad para Florencia Ferraro Propiedades, la misma inmobiliaria a la que le hice la web. Las tomas con drone y la edición son mías.',
+        details: [
+          { label: 'Qué hice', text: 'Filmación con drone, tomas de interiores y edición del video.' },
+          { label: 'Formato', text: 'Video vertical 9:16 con el logo de la inmobiliaria al cierre.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Video · Drone',
+        title: 'House in Camet Norte',
+        summary: 'A property video for Florencia Ferraro Propiedades, the same real estate agency whose website I built. I shot the drone footage and edited it.',
+        details: [
+          { label: 'What I did', text: 'Drone footage, interior shots and editing.' },
+          { label: 'Format', text: 'Vertical 9:16 video closing with the agency’s logo.' },
         ],
       },
     },

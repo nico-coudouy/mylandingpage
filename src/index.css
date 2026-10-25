@@ -220,6 +220,9 @@ h2{font-weight:800;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-
 .msn-msg .who.me{color:var(--mint)}
 .msn-msg time{font:500 11px var(--mono);color:var(--dim);font-weight:500}
 .msn-msg p{margin:3px 0 0 12px;font-size:15.5px;line-height:1.5;color:var(--fg);white-space:pre-wrap;overflow-wrap:anywhere}
+.msn-msg p a{color:#8FB4FF;text-decoration:underline;text-decoration-color:rgba(143,180,255,.45);text-underline-offset:3px;overflow-wrap:anywhere}
+.msn-msg p a:hover{color:var(--mint);text-decoration-color:var(--mint)}
+.msn-msg p strong{font-weight:650}
 .msn-event{align-self:center;font:500 12px var(--mono);letter-spacing:.06em;color:var(--dim)}
 .msn-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
 .msn-form input{flex:1;min-width:0;font:inherit;font-size:15.5px;color:var(--fg);background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:12px 14px}

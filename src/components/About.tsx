@@ -22,6 +22,12 @@ const COPY = {
       { year: '2026', title: 'Teleocho Informa', text: 'Paquete gráfico del noticiero generado con código' },
       { year: '2027', title: 'Tecnicatura en Programación', text: 'Teclab, en curso', next: true },
     ],
+    photosTitle: 'Del otro lado de la pantalla',
+    photos: [
+      { src: '/assets/foto-control.webp', w: 900, h: 1192, alt: 'Nico en el control de aire de Canal 8, con auricular y frente al switcher', cap: 'Control de aire · Canal 8' },
+      { src: '/assets/foto-grua.webp', w: 900, h: 1131, alt: 'Nico operando una grúa de cámara en el estudio', cap: 'Grúa de cámara en estudio' },
+      { src: '/assets/foto-teleocho.webp', w: 900, h: 1200, alt: 'Switcher y pared de monitores del control con Teleocho Informa al aire', cap: 'Teleocho Informa al aire' },
+    ],
   },
   en: {
     eyebrow: 'About',
@@ -43,6 +49,12 @@ const COPY = {
       { year: '2024', title: 'Mar del Plata Film Festival', text: 'Social media editing for the 2024, 2025 and 2026 editions' },
       { year: '2026', title: 'Teleocho Informa', text: 'Newscast graphics package generated with code' },
       { year: '2027', title: 'Associate degree in Programming', text: 'Teclab, in progress', next: true },
+    ],
+    photosTitle: 'The other side of the screen',
+    photos: [
+      { src: '/assets/foto-control.webp', w: 900, h: 1192, alt: 'Nico in the Canal 8 control room, wearing a headset at the switcher', cap: 'Control room · Canal 8' },
+      { src: '/assets/foto-grua.webp', w: 900, h: 1131, alt: 'Nico operating a camera crane in the studio', cap: 'Camera crane in the studio' },
+      { src: '/assets/foto-teleocho.webp', w: 900, h: 1200, alt: 'Control room switcher and monitor wall with Teleocho Informa on air', cap: 'Teleocho Informa on air' },
     ],
   },
 };
@@ -74,6 +86,17 @@ export default function About() {
               </li>
             ))}
           </ol>
+        </div>
+        <div className="photo-strip">
+          <span className="eyebrow">{c.photosTitle}</span>
+          <div className="photo-grid">
+            {c.photos.map((p) => (
+              <figure key={p.src}>
+                <img src={p.src} alt={p.alt} width={p.w} height={p.h} loading="lazy" decoding="async" />
+                <figcaption>{p.cap}</figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLang } from '../i18n';
 
-type Props = { src: string; poster: string; label?: string };
+type Props = { src: string; poster: string; label?: string; onProgress?: (p: number) => void };
 
 /**
  * Muted looping video that plays while it is on screen.
@@ -11,7 +11,7 @@ type Props = { src: string; poster: string; label?: string };
  * The pause button covers the accessibility side (WCAG 2.2.2), and a manual
  * pause sticks until the visitor presses play again.
  */
-export default function AutoVideo({ src, poster, label }: Props) {
+export default function AutoVideo({ src, poster, label, onProgress }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(false);
@@ -59,6 +59,7 @@ export default function AutoVideo({ src, poster, label }: Props) {
         aria-label={label}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
+        onTimeUpdate={onProgress ? (e) => { const v = e.currentTarget; if (v.duration) onProgress(v.currentTime / v.duration); } : undefined}
       />
       <button type="button" className="vid-toggle" onClick={toggle} aria-label={action} title={action}>
         {playing ? (

@@ -4,6 +4,7 @@ import AutoVideo from '../components/AutoVideo';
 import TeleochoMedia from '../components/projects/TeleochoMedia';
 import BrowserPreview from '../components/projects/BrowserPreview';
 import AutomationConsole from '../components/projects/AutomationConsole';
+import AudiovisualMedia, { FestivalEditions } from '../components/projects/AudiovisualMedia';
 
 export type Category = 'web' | 'auto' | 'broadcast' | 'av';
 
@@ -34,17 +35,10 @@ export type Project = {
   media: ReactNode;
   logo?: { src: string; alt: string };
   href?: string;
+  /** Extra block for featured rows, shown under the summary. */
+  extra?: ReactNode;
   text: Record<Lang, ProjectText>;
 };
-
-/** Vertical video centered over a blurred copy of its poster, for 4:3 card thumbnails. */
-function VerticalVideo({ name, label }: { name: string; label: string }) {
-  return (
-    <div className="vert-wrap" style={{ backgroundImage: `url(/assets/${name}.jpg)` }}>
-      <AutoVideo src={`/assets/${name}.mp4`} poster={`/assets/${name}.jpg`} label={label} />
-    </div>
-  );
-}
 
 export const PROJECTS: Project[] = [
   {
@@ -139,6 +133,34 @@ export const PROJECTS: Project[] = [
     },
   },
   {
+    id: 'audiovisual',
+    featured: true,
+    categories: ['av'],
+    tags: ['Premiere Pro', 'After Effects', 'Motion graphics', 'Drone DJI'],
+    media: <AudiovisualMedia />,
+    extra: <FestivalEditions />,
+    text: {
+      es: {
+        eyebrow: 'Edición audiovisual',
+        title: 'Festival de Cine y video con drone',
+        summary: 'Edición y animación de videos para las redes del Festival Internacional de Cine de Mar del Plata, y videos de propiedades para Florencia Ferraro Propiedades.',
+        details: [
+          { label: 'Festival', text: 'Reels de feed e historias de las actividades del festival, con gráfica animada, en tres ediciones seguidas.' },
+          { label: 'Camet Norte', text: 'Video de un chalet para la inmobiliaria: tomas con drone, interiores y edición en formato vertical.' },
+        ],
+      },
+      en: {
+        eyebrow: 'Video editing',
+        title: 'Film festival and drone video',
+        summary: 'Video editing and animation for the Mar del Plata International Film Festival’s social media, plus property videos for Florencia Ferraro Propiedades.',
+        details: [
+          { label: 'Festival', text: 'Feed reels and stories covering the festival’s events, with animated graphics, three editions in a row.' },
+          { label: 'Camet Norte', text: 'A house video for the real estate agency: drone footage, interiors and vertical editing.' },
+        ],
+      },
+    },
+  },
+  {
     id: 'conversor',
     featured: false,
     categories: ['auto'],
@@ -195,65 +217,6 @@ export const PROJECTS: Project[] = [
           { label: 'Problem', text: 'The pilot gym used a generic booking tool and wanted its own, under its brand.' },
           { label: 'Solution', text: 'A multi-gym platform with capped classes, expiring credits and an admin panel.' },
           { label: 'Result', text: 'Running as a pilot with a gym in Mar del Plata.' },
-        ],
-      },
-    },
-  },
-  {
-    id: 'festival',
-    featured: false,
-    categories: ['av'],
-    tags: ['Premiere Pro', 'After Effects', 'Motion graphics'],
-    media: (
-      <>
-        <VerticalVideo name="festival" label="Mar del Plata International Film Festival" />
-        <span className="mini-over">2024 · 2025 · 2026</span>
-      </>
-    ),
-    text: {
-      es: {
-        eyebrow: 'Edición audiovisual',
-        title: 'Festival Internacional de Cine de Mar del Plata',
-        summary: 'Edición y animación de videos para las redes del festival en tres ediciones seguidas: 2024, 2025 y 2026.',
-        details: [
-          { label: 'Qué hago', text: 'Reels de feed e historias de las actividades del festival.' },
-          { label: 'Formatos', text: 'Edición del video de feed y su adaptación a formato historia, con gráfica animada.' },
-        ],
-      },
-      en: {
-        eyebrow: 'Video editing',
-        title: 'Mar del Plata International Film Festival',
-        summary: 'Video editing and animation for the festival’s social media, three editions in a row: 2024, 2025 and 2026.',
-        details: [
-          { label: 'What I do', text: 'Feed reels and stories covering the festival’s events.' },
-          { label: 'Formats', text: 'Editing the feed video and adapting it to the story format, with animated graphics.' },
-        ],
-      },
-    },
-  },
-  {
-    id: 'camet-norte',
-    featured: false,
-    categories: ['av'],
-    tags: ['Drone DJI', 'Premiere Pro', 'Edición'],
-    media: <VerticalVideo name="camet-norte" label="Chalet en Camet Norte" />,
-    text: {
-      es: {
-        eyebrow: 'Video · Drone',
-        title: 'Chalet en Camet Norte',
-        summary: 'Video de una propiedad para Florencia Ferraro Propiedades, la misma inmobiliaria a la que le hice la web. Las tomas con drone y la edición son mías.',
-        details: [
-          { label: 'Qué hice', text: 'Filmación con drone, tomas de interiores y edición del video.' },
-          { label: 'Formato', text: 'Video vertical 9:16 con el logo de la inmobiliaria al cierre.' },
-        ],
-      },
-      en: {
-        eyebrow: 'Video · Drone',
-        title: 'House in Camet Norte',
-        summary: 'A property video for Florencia Ferraro Propiedades, the same real estate agency whose website I built. I shot the drone footage and edited it.',
-        details: [
-          { label: 'What I did', text: 'Drone footage, interior shots and editing.' },
-          { label: 'Format', text: 'Vertical 9:16 video closing with the agency’s logo.' },
         ],
       },
     },

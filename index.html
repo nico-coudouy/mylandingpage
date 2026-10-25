@@ -6,7 +6,10 @@
     <title>Nico Coudouy · Desarrollo web y automatización</title>
     <meta name="description" content="Convierto procesos manuales en software que funciona. Desarrollo web y automatización, con 9 años de experiencia en televisión en vivo. Mar del Plata, remoto para Argentina y LatAm." />
     <meta name="theme-color" content="#06080D" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />
@@ -19,9 +22,21 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Nicolás Coudouy",
+        "alternateName": "Nico Coudouy",
+        "url": "https://www.nicolascoudouy.com.ar/",
+        "image": "https://www.nicolascoudouy.com.ar/assets/nico.jpg",
+        "jobTitle": "Desarrollador web y de automatización",
+        "email": "mailto:nicocoudouy@gmail.com",
+        "address": { "@type": "PostalAddress", "addressLocality": "Mar del Plata", "addressRegion": "Buenos Aires", "addressCountry": "AR" },
+        "knowsAbout": ["Desarrollo web", "Automatización", "React", "TypeScript", "Python", "Supabase", "Gráfica broadcast", "Edición de video"],
+        "sameAs": ["https://www.linkedin.com/in/nicocoudouy", "https://github.com/nico-coudouy"]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

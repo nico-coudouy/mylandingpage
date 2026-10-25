@@ -1,5 +1,7 @@
 # Nico Coudouy · Landing personal
 
+[![CI](https://github.com/nico-coudouy/mylandingpage/actions/workflows/ci.yml/badge.svg)](https://github.com/nico-coudouy/mylandingpage/actions/workflows/ci.yml)
+
 Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años de experiencia en televisión en vivo en Canal 8 Mar del Plata.
 
 🔗 **Sitio:** [nicolascoudouy.com.ar](https://www.nicolascoudouy.com.ar)
@@ -8,7 +10,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 
 ## Qué incluye
 
-- **Proyectos como casos:** problema, solución, resultado y stack, con video y capturas reales. Filtros por Web, Automatización, Broadcast y Audiovisual.
+- **Proyectos como casos:** problema, solución, resultado medible y stack, con video y capturas reales. Tres casos destacados, tarjetas compactas para el resto y filtros por Web, Automatización, Broadcast y Audiovisual.
   - Teleocho Informa (Canal 8): paquete gráfico del noticiero generado con código.
   - Florencia Ferraro Propiedades: web para una inmobiliaria.
   - Automatizaciones para Canal 8: escáner del archivo de video y rundowns de Airtable a Squid CGX.
@@ -17,7 +19,9 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
   - LiveRundown: proyecto en desarrollo.
 - **Asistente con IA:** chat que responde sobre mi perfil con GPT-OSS 120B vía Groq, con límite de uso por visitante y por día.
 - **Microinteracciones:** campo de puntos que reacciona al mouse, monitor de cámara con timecode en vivo, consola que tipea comandos y navegador que recorre una web.
-- **Accesible y liviano:** respeta `prefers-reduced-motion`, los videos se pausan fuera de pantalla y no usa librerías de UI.
+- **Español e inglés:** selector ES/EN en el menú; el asistente responde en el idioma elegido.
+- **Accesible y liviano:** contraste WCAG AA, respeta `prefers-reduced-motion`, los videos se pausan fuera de pantalla, fuentes servidas desde el propio sitio y sin librerías de UI.
+- **Seguro y encontrable:** encabezados de seguridad (CSP, Referrer-Policy, X-Frame-Options), datos estructurados de Persona, `robots.txt` y `sitemap.xml`.
 
 ## Stack
 
@@ -27,6 +31,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 - Groq (GPT-OSS 120B) como modelo, con un proveedor de respaldo opcional
 - Upstash Redis + `@upstash/ratelimit` para los límites de uso
 - Vercel Analytics
+- Vitest + GitHub Actions (tipos, tests y build en cada push)
 
 ## Cómo funciona el límite del asistente
 
@@ -68,6 +73,7 @@ npx vercel dev     # frontend + función del asistente
 
 ```bash
 npm run lint       # chequeo de tipos
+npm test           # tests de la API del asistente
 npm run build      # build de producción en dist/
 ```
 
@@ -75,7 +81,10 @@ npm run build      # build de producción en dist/
 
 ```
 .
+├── .github/workflows/ci.yml # Tipos, tests y build en cada push
 ├── api/chat.ts              # Asistente: límites, validación y llamada al modelo
+├── tests/chat.test.ts       # Tests de la API (validación, límites, errores, respaldo)
+├── vercel.json              # Redirección del dominio viejo y encabezados de seguridad
 ├── public/
 │   ├── assets/              # Videos, capturas, foto y CV
 │   └── og-image.png         # Imagen para compartir en redes
@@ -84,6 +93,7 @@ npm run build      # build de producción en dist/
     │   └── projects/        # Medios interactivos de cada proyecto
     ├── data/                # Proyectos y datos de contacto
     ├── hooks/               # useReducedMotion
+    ├── i18n.tsx             # Idioma (ES/EN) y textos
     ├── lib/chat.ts          # Cliente del asistente
     ├── App.tsx
     └── index.css

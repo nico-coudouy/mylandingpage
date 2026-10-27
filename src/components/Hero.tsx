@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
-import { ArrowDown, ArrowUpRight } from './Icons';
+import { Link } from 'react-router';
+import { ArrowUpRight } from './Icons';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CV_URL } from '../data/profile';
 import { useCopy } from '../i18n';
@@ -156,7 +157,7 @@ export default function Hero() {
           <h1>{c.h1a}<em>{c.h1b}</em></h1>
           <p className="lead">{c.lead}</p>
           <div className="ctas">
-            <a className="btn primary" href="#proyectos">{c.projects} <ArrowDown /></a>
+            <Link className="btn primary" to="/proyectos">{c.projects} <ArrowUpRight /></Link>
             <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv} <ArrowUpRight /></a>
           </div>
         </div>

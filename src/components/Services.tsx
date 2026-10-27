@@ -65,7 +65,7 @@ const ICONS = [<CodeIcon key="code" />, <VideoIcon key="video" />];
 export default function Services() {
   const c = useCopy(COPY);
   return (
-    <section className="sec" id="servicios" style={{ paddingTop: 0 }}>
+    <section className="sec" id="servicios">
       <div className="wrap">
         <div className="sec-head">
           <span className="eyebrow">{c.eyebrow}</span>

@@ -6,9 +6,11 @@ import { tokenize } from '../lib/richText';
 
 const COPY = {
   es: {
-    eyebrow: 'Asistente con IA',
-    title: 'Conectado desde 2005.',
-    lead: 'Un guiño al Messenger con el que aprendimos a chatear, con IA de hoy: responde sobre mis proyectos, mi experiencia y cómo contactarme. Probá el zumbido.',
+    open: 'Abrir el chat con el asistente de Nico',
+    close: 'Cerrar el chat',
+    minimize: 'Minimizar el chat',
+    teaser: '¿Dudas? Preguntale a mi asistente. Probá el zumbido 😄',
+    dismiss: 'Cerrar aviso',
     window: 'Conversación con Nico',
     name: 'Nico (asistente)',
     status: 'Disponible',
@@ -30,13 +32,15 @@ const COPY = {
       'Zumbido recibido (y) Preguntame lo que quieras sobre Nico.',
       '¡Me hiciste temblar la ventana! ;) ¿Qué querés saber?',
     ],
-    remaining: (n: number) => `Te quedan ${n} ${n === 1 ? 'pregunta' : 'preguntas'} hoy. El zumbido no cuenta.`,
-    limit: 'Podés hacer hasta 10 preguntas por día. El zumbido no cuenta.',
+    remaining: (n: number) => `Te quedan ${n} ${n === 1 ? 'pregunta' : 'preguntas'} hoy · IA con Groq`,
+    limit: 'Hasta 10 preguntas por día · el zumbido no cuenta · IA con Groq',
   },
   en: {
-    eyebrow: 'AI assistant',
-    title: 'Online since 2005.',
-    lead: 'A nod to the Messenger many of us learned to chat on, powered by today’s AI: it answers questions about my projects, my experience and how to reach me. Try the nudge.',
+    open: "Open the chat with Nico's assistant",
+    close: 'Close the chat',
+    minimize: 'Minimize the chat',
+    teaser: 'Questions? Ask my assistant. Try the nudge 😄',
+    dismiss: 'Dismiss',
     window: 'Conversation with Nico',
     name: 'Nico (assistant)',
     status: 'Available',
@@ -58,8 +62,8 @@ const COPY = {
       'Nudge received (y) Ask me anything about Nico.',
       'You made my window shake! ;) What would you like to know?',
     ],
-    remaining: (n: number) => `${n} ${n === 1 ? 'question' : 'questions'} left today. Nudges don't count.`,
-    limit: "You can ask up to 10 questions a day. Nudges don't count.",
+    remaining: (n: number) => `${n} ${n === 1 ? 'question' : 'questions'} left today · AI by Groq`,
+    limit: "Up to 10 questions a day · nudges don't count · AI by Groq",
   },
 };
 
@@ -120,14 +124,58 @@ export default function Assistant() {
   const [limited, setLimited] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
   const [shake, setShake] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [teaser, setTeaser] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const bubbleRef = useRef<HTMLButtonElement>(null);
   const lastNudge = useRef(0);
   const play = useSound();
 
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [lines, busy]);
+  }, [lines, busy, open]);
+
+  // A one-time hint next to the bubble, a few seconds after the first visit of the session.
+  useEffect(() => {
+    let seen = false;
+    try { seen = sessionStorage.getItem('chat-teaser') === '1'; } catch { /* storage blocked */ }
+    if (seen) return;
+    const id = setTimeout(() => setTeaser(true), 7000);
+    return () => clearTimeout(id);
+  }, []);
+
+  const hideTeaser = () => {
+    setTeaser(false);
+    try { sessionStorage.setItem('chat-teaser', '1'); } catch { /* storage blocked */ }
+  };
+
+  const show = () => {
+    hideTeaser();
+    setOpen(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+  const hide = () => {
+    setOpen(false);
+    setTimeout(() => bubbleRef.current?.focus(), 0);
+  };
+
+  // On phones the chat covers the screen: keep the page behind it from scrolling.
+  useEffect(() => {
+    if (!open || !window.matchMedia('(max-width: 600px)').matches) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
+  // Old links to the assistant section open the window instead.
+  useEffect(() => {
+    const onHash = () => { if (location.hash === '#asistente') show(); };
+    onHash();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ask = async (question: string) => {
     const q = question.trim().slice(0, MAX_CHARS);
@@ -173,22 +221,32 @@ export default function Assistant() {
   const lastBot = [...lines].reverse().find((l) => l.role === 'assistant');
 
   return (
-    <section className="sec" id="asistente" style={{ paddingTop: 0 }}>
-      <div className="wrap ai">
-        <div className="sec-head" style={{ margin: 0 }}>
-          <span className="eyebrow">{c.eyebrow}</span>
-          <h2>{c.title}</h2>
-          <p className="lead" style={{ margin: 0 }}>{c.lead}</p>
-          <div className="tags"><span className="tag">Groq</span><span className="tag">GPT-OSS 120B</span><span className="tag">Vercel Functions</span></div>
+    <div className="msn-dock">
+      {!open && teaser && (
+        <div className="msn-teaser" role="status">
+          <button type="button" className="msn-teaser-text" onClick={show}>{c.teaser}</button>
+          <button type="button" className="msn-teaser-x" onClick={hideTeaser} aria-label={c.dismiss}>✕</button>
         </div>
-        <div>
-          <div className={`msn${shake ? (reduce ? ' flash' : ' shake') : ''}`}>
+      )}
+      {!open && (
+        <button ref={bubbleRef} type="button" className="msn-bubble" onClick={show} aria-label={c.open} aria-haspopup="dialog">
+          <span className="msn-bubble-dp"><img src="/assets/nico.jpg" alt="" width={40} height={40} /><i /></span>
+          <span className="msn-bubble-txt"><b>{c.name}</b><small>{c.status}</small></span>
+          {lines.some((l) => l.role === 'assistant') && <span className="msn-bubble-dot" aria-hidden="true" />}
+        </button>
+      )}
+      {open && (
+          <div className={`msn msn-float${shake ? (reduce ? ' flash' : ' shake') : ''}`} role="dialog" aria-label={c.window} onKeyDown={(e) => { if (e.key === 'Escape') hide(); }}>
             <div className="msn-title">
               <span className="msn-ico" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 24 24"><path d="M4 5h16v10H9l-5 4z" fill="currentColor" /></svg>
               </span>
               <span>{c.window}</span>
-              <span className="msn-win" aria-hidden="true"><i>–</i><i>□</i><i>✕</i></span>
+              <span className="msn-win">
+                <button type="button" onClick={hide} aria-label={c.minimize} title={c.minimize}>–</button>
+                <i aria-hidden="true">□</i>
+                <button type="button" className="x" onClick={hide} aria-label={c.close} title={c.close}>✕</button>
+              </span>
             </div>
 
             <div className="msn-tools" role="toolbar" aria-label={c.window}>
@@ -242,6 +300,7 @@ export default function Assistant() {
 
             <form className="msn-form" onSubmit={onSubmit}>
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -253,11 +312,9 @@ export default function Assistant() {
               />
               <button type="submit" disabled={busy || limited}>{c.send}</button>
             </form>
-            <div className="msn-bar">{busy ? c.typing : lastBot ? c.lastAt(lastBot.time) : ' '}</div>
+            <div className="msn-bar"><span>{busy ? c.typing : lastBot ? c.lastAt(lastBot.time) : '\u00a0'}</span><span className="msn-quota">{remaining !== null ? c.remaining(remaining) : c.limit}</span></div>
           </div>
-          <p className="note">{remaining !== null ? c.remaining(remaining) : c.limit}</p>
-        </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }

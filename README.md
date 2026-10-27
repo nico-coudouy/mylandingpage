@@ -10,6 +10,9 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 
 ## Qué incluye
 
+- **Páginas:** Inicio (hero, credenciales y reel), Proyectos, Servicios y Sobre mí, con React Router, carga por página y un HTML por página con su título y descripción para buscadores.
+- **Asistente flotante:** ventana estilo Messenger disponible en todas las páginas.
+- **Demo de Tiza:** la app se puede probar desde la tarjeta del proyecto, con datos de ejemplo.
 - **Reel:** video de 68 s en escritorio y versión vertical de 48 s en el celular, con controles propios (reproducir, sonido, pantalla completa y duración).
 - **Proyectos como casos:** problema, solución, resultado medible y stack, con video y capturas reales. Tres casos destacados, tarjetas compactas para el resto y filtros por Web, Automatización, Broadcast y Audiovisual.
   - Teleocho Informa (Canal 8): paquete gráfico del noticiero generado con código.

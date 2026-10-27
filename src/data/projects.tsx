@@ -5,6 +5,7 @@ import TeleochoMedia from '../components/projects/TeleochoMedia';
 import BrowserPreview from '../components/projects/BrowserPreview';
 import AutomationConsole from '../components/projects/AutomationConsole';
 import AudiovisualMedia, { FestivalEditions } from '../components/projects/AudiovisualMedia';
+import TizaDemo from '../components/projects/TizaDemo';
 
 export type Category = 'web' | 'auto' | 'broadcast' | 'av';
 
@@ -37,6 +38,8 @@ export type Project = {
   href?: string;
   /** Extra block for featured rows, shown under the summary. */
   extra?: ReactNode;
+  /** Interactive extra for compact cards, e.g. a demo button. */
+  action?: ReactNode;
   text: Record<Lang, ProjectText>;
 };
 
@@ -196,6 +199,7 @@ export const PROJECTS: Project[] = [
     categories: ['web'],
     tags: ['Supabase', 'Vercel', 'GitHub'],
     media: <img src="/assets/tiza-thumb.jpg" alt="Tiza" width={1200} height={900} loading="lazy" />,
+    action: <TizaDemo />,
     text: {
       es: {
         eyebrow: 'Producto propio · Web app',

@@ -1,57 +1,64 @@
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
 import Nav from './components/Nav';
-import Hero from './components/Hero';
-import Projects from './components/Projects';
-import Reel from './components/Reel';
-import Services from './components/Services';
-import Assistant from './components/Assistant';
-import About from './components/About';
-import Team from './components/Team';
 import Contact from './components/Contact';
-import { useCopy } from './i18n';
+import Assistant from './components/Assistant';
+import Home from './pages/Home';
+import { useCopy, useLang } from './i18n';
+import { LEGACY_HASHES, ROUTES } from './routes';
+
+// Inner pages load on demand, so the home page ships less code.
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 const COPY = {
-  es: {
-    credsLabel: 'Credenciales',
-    creds: [
-      ['9 años', 'en televisión en vivo, en Canal 8 Mar del Plata'],
-      ['3', 'ediciones del Festival Internacional de Cine de Mar del Plata'],
-      ['38', 'piezas de gráfica broadcast entregadas para un noticiero'],
-      ['4–6 h', 'por semana que ahorra el escáner del archivo de video'],
-    ],
-    madeWith: 'HECHO CON REACT Y VERCEL',
-  },
-  en: {
-    credsLabel: 'Credentials',
-    creds: [
-      ['9 years', 'in live television at Canal 8 Mar del Plata'],
-      ['3', 'editions of the Mar del Plata International Film Festival'],
-      ['38', 'broadcast graphics pieces delivered for a newscast'],
-      ['4–6 h', 'saved every week by the video archive scanner'],
-    ],
-    madeWith: 'MADE WITH REACT AND VERCEL',
-  },
+  es: { madeWith: 'HECHO CON REACT Y VERCEL', notFound: 'Esta página no existe.', home: 'Volver al inicio' },
+  en: { madeWith: 'MADE WITH REACT AND VERCEL', notFound: "This page doesn't exist.", home: 'Back to home' },
 };
 
-export default function App() {
+function setMeta(selector: string, attr: string, value: string) {
+  document.querySelector(selector)?.setAttribute(attr, value);
+}
+
+/** Scroll to the top on page change, keep the tab title in sync and send old #anchors to their page. */
+function PageEffects() {
+  const { pathname, hash } = useLocation();
+  const navigate = useNavigate();
+  const { lang } = useLang();
+
+  useEffect(() => {
+    const to = LEGACY_HASHES[hash];
+    if (to && pathname === '/') navigate(to, { replace: true });
+  }, [hash, pathname, navigate]);
+
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0);
+  }, [pathname, hash]);
+
+  useEffect(() => {
+    const r = ROUTES.find((x) => x.path === pathname) ?? ROUTES[0];
+    document.title = r.title[lang];
+    const url = `https://www.nicolascoudouy.com.ar${r.path === '/' ? '/' : r.path}`;
+    setMeta('meta[name="description"]', 'content', r.description[lang]);
+    setMeta('link[rel="canonical"]', 'href', url);
+    setMeta('meta[property="og:url"]', 'content', url);
+    setMeta('meta[property="og:title"]', 'content', r.title[lang]);
+  }, [pathname, lang]);
+
+  return null;
+}
+
+function Layout() {
   const c = useCopy(COPY);
   return (
     <>
+      <PageEffects />
       <Nav />
       <main>
-        <Hero />
-        <section className="creds" aria-label={c.credsLabel}>
-          <div className="wrap">
-            {c.creds.map(([n, t]) => (
-              <div key={n} className="cred"><b>{n}</b><span>{t}</span></div>
-            ))}
-          </div>
-        </section>
-        <Reel />
-        <Projects />
-        <Services />
-        <Assistant />
-        <About />
-        <Team />
+        <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
+          <Outlet />
+        </Suspense>
         <Contact />
       </main>
       <footer>
@@ -60,6 +67,36 @@ export default function App() {
           <span>{c.madeWith}</span>
         </div>
       </footer>
+      <Assistant />
     </>
+  );
+}
+
+function NotFound() {
+  const c = useCopy(COPY);
+  return (
+    <section className="sec">
+      <div className="wrap sec-head">
+        <span className="eyebrow">404</span>
+        <h2>{c.notFound}</h2>
+        <a className="btn primary" href="/" style={{ alignSelf: 'flex-start' }}>{c.home}</a>
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="proyectos" element={<ProjectsPage />} />
+          <Route path="servicios" element={<ServicesPage />} />
+          <Route path="sobre-mi" element={<AboutPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }

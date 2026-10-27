@@ -1,27 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router';
 import { useCopy, useLang, type Lang } from '../i18n';
+import { ROUTES } from '../routes';
 
 const COPY = {
-  es: {
-    sections: [
-      { id: 'proyectos', label: 'Proyectos' },
-      { id: 'servicios', label: 'Servicios' },
-      { id: 'sobre-mi', label: 'Sobre mí' },
-    ],
-    cta: 'Escribime',
-    nav: 'Secciones',
-    lang: 'Idioma',
-  },
-  en: {
-    sections: [
-      { id: 'proyectos', label: 'Projects' },
-      { id: 'servicios', label: 'Services' },
-      { id: 'sobre-mi', label: 'About' },
-    ],
-    cta: 'Contact me',
-    nav: 'Sections',
-    lang: 'Language',
-  },
+  es: { cta: 'Escribime', nav: 'Páginas', lang: 'Idioma', menu: 'Abrir menú', closeMenu: 'Cerrar menú' },
+  en: { cta: 'Contact me', nav: 'Pages', lang: 'Language', menu: 'Open menu', closeMenu: 'Close menu' },
 };
 
 const LANGS: Lang[] = ['es', 'en'];
@@ -29,33 +13,32 @@ const LANGS: Lang[] = ['es', 'en'];
 export default function Nav() {
   const c = useCopy(COPY);
   const { lang, setLang } = useLang();
-  const [active, setActive] = useState<string | null>(null);
+  const { pathname } = useLocation();
+  const [open, setOpen] = useState(false);
 
-  // Highlight the link of the section crossing the middle of the viewport.
+  // Close the mobile menu after navigating or pressing Escape.
+  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: '-45% 0px -50% 0px' },
-    );
-    ['proyectos', 'servicios', 'asistente', 'sobre-mi', 'contacto'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) io.observe(el);
-    });
-    return () => io.disconnect();
-  }, []);
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
-    <header className="nav">
+    <header className={`nav${open ? ' open' : ''}`}>
       <div className="wrap">
-        <a className="brand" href="#inicio">
+        <Link className="brand" to="/">
           <span className="mark">NC</span>Nico Coudouy
-        </a>
+        </Link>
         <nav className="links" aria-label={c.nav}>
-          {c.sections.map((s) => (
-            <a key={s.id} href={`#${s.id}`} className={active === s.id ? 'on' : undefined}>
-              {s.label}
-            </a>
-          ))}
+          <div className="pages" id="nav-pages">
+            {ROUTES.map((r) => (
+              <NavLink key={r.path} to={r.path} end className={({ isActive }) => (isActive ? 'on' : undefined)}>
+                {r.label[lang]}
+              </NavLink>
+            ))}
+          </div>
           <div className="lang" role="group" aria-label={c.lang}>
             {LANGS.map((l) => (
               <button key={l} aria-pressed={lang === l} onClick={() => setLang(l)} lang={l}>
@@ -63,7 +46,10 @@ export default function Nav() {
               </button>
             ))}
           </div>
-          <a className="btn primary" href="#contacto">{c.cta}</a>
+          <a className="btn primary" href="#contacto" onClick={() => setOpen(false)}>{c.cta}</a>
+          <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav-pages" aria-label={open ? c.closeMenu : c.menu} onClick={() => setOpen(!open)}>
+            <span aria-hidden="true" />
+          </button>
         </nav>
       </div>
     </header>

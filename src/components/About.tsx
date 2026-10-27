@@ -62,7 +62,7 @@ const COPY = {
 export default function About() {
   const c = useCopy(COPY);
   return (
-    <section className="sec" id="sobre-mi" style={{ paddingTop: 0 }}>
+    <section className="sec" id="sobre-mi">
       <div className="wrap">
         <div className="sec-head">
           <span className="eyebrow">{c.eyebrow}</span>

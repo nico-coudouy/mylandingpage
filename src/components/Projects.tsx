@@ -65,6 +65,7 @@ function CompactCase({ p, detailsLabel }: { p: Project; detailsLabel: string }) 
           <Details items={t.details} />
         </details>
         <Tags tags={p.tags} />
+        {p.action}
         {p.href && t.link && (
           <a className="mini-link" href={p.href} target="_blank" rel="noopener">{t.link} <ArrowUpRight size={14} /></a>
         )}

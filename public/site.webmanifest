@@ -3,8 +3,8 @@
   "short_name": "Nico Coudouy",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#06080D",
-  "theme_color": "#06080D",
+  "background_color": "#0E0E0F",
+  "theme_color": "#0E0E0F",
   "icons": [
     {
       "src": "/icon-192.png",

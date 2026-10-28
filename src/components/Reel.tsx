@@ -5,6 +5,7 @@ const COPY = {
   es: {
     eyebrow: 'Reel',
     title: 'Lo que hago, en un minuto.',
+    text: 'Televisión, webs para clientes y herramientas que automatizan el trabajo del canal, en un solo video con música propia.',
     play: 'Reproducir', pause: 'Pausar',
     soundOn: 'Activar sonido', soundOff: 'Silenciar',
     full: 'Pantalla completa', exitFull: 'Salir de pantalla completa',
@@ -13,6 +14,7 @@ const COPY = {
   en: {
     eyebrow: 'Reel',
     title: 'What I do, in a minute.',
+    text: 'Live TV, client websites and tools that automate the station’s work, in one video with its own music.',
     play: 'Play', pause: 'Pause',
     soundOn: 'Unmute', soundOff: 'Mute',
     full: 'Full screen', exitFull: 'Exit full screen',
@@ -91,11 +93,12 @@ export default function Reel() {
   };
 
   return (
-    <section className="sec reel-sec" id="reel" style={{ paddingTop: 0 }}>
-      <div className="wrap">
-        <div className="sec-head">
-          <span className="eyebrow">{c.eyebrow}</span>
+    <section className="sec reel-sec" id="reel">
+      <div className="wrap reel-grid">
+        <div className="sec-head reel-head">
+          <span className="eyebrow">{c.eyebrow} · {fmt(duration || (vertical ? 48 : 68))}</span>
           <h2>{c.title}</h2>
+          <p className="lead">{c.text}</p>
         </div>
         <div ref={box} className={`reel-player${vertical ? ' vert' : ''}${full ? ' full' : ''}`}>
           <div className="reel-stage">

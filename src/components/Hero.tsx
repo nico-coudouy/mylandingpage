@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowUpRight } from './Icons';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CV_URL } from '../data/profile';
 import { useCopy } from '../i18n';
 
-/** Dot grid behind the hero that glows around the pointer. */
+/** Faint dot grid behind the hero that warms up around the pointer. */
 function DotField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
@@ -44,8 +44,8 @@ function DotField() {
           for (let x = sp / 2; x < w; x += sp) {
             const wave = Math.sin(x * 0.006 + t * 0.6) * Math.cos(y * 0.008 - t * 0.4);
             const glow = tx < -900 ? 0 : Math.max(0, 1 - Math.hypot(x - mx, y - my) / 220);
-            const a = (0.05 + Math.max(0, wave) * 0.08 + glow * 0.5).toFixed(3);
-            ctx.fillStyle = glow > 0.05 ? `rgba(46,230,166,${a})` : `rgba(150,175,220,${a})`;
+            const a = (0.04 + Math.max(0, wave) * 0.06 + glow * 0.55).toFixed(3);
+            ctx.fillStyle = glow > 0.05 ? `rgba(255,91,31,${a})` : `rgba(242,238,231,${a})`;
             const s = 1.6 + glow * 1.6;
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
           }
@@ -92,75 +92,78 @@ function useTimecode() {
 
 const COPY = {
   es: {
-    status: 'DISPONIBLE · MAR DEL PLATA · REMOTO AR / LATAM',
-    h1a: 'Convierto procesos manuales en ',
-    h1b: 'software que funciona.',
-    lead: 'Desarrollo web y automatización, con 9 años de experiencia en operación televisiva en vivo en Canal 8 Mar del Plata.',
+    onAir: 'AL AIRE DESDE 2017',
+    where: 'MAR DEL PLATA · REMOTO AR / LATAM',
+    pre1: 'Convierto', word1: 'procesos', pre2: 'en', word2: 'software', rest: ' que funciona.',
+    hello: 'Hola, soy Nico.',
+    lead: 'Desarrollo web y automatización, con 9 años de experiencia en televisión en vivo en Canal 8 Mar del Plata.',
     projects: 'Ver proyectos',
     cv: 'Descargar CV',
-    onAir: 'CAM 1 · AL AIRE',
-    alt: 'Retrato de Nico Coudouy',
+    available: 'DISPONIBLE',
+    cardTitle: 'Busco sumarme a un equipo y tomo proyectos puntuales.',
+    cardText: 'Respondo en menos de 24 horas.',
+    alt: 'Retrato de Nico Coudouy en blanco y negro',
+    services: ['Desarrollo web', 'Automatización', 'Gráfica broadcast', 'Edición y streaming'],
+    servicesLabel: 'Lo que hago',
   },
   en: {
-    status: 'AVAILABLE · MAR DEL PLATA, ARGENTINA · REMOTE',
-    h1a: 'I turn manual processes into ',
-    h1b: 'software that works.',
+    onAir: 'ON AIR SINCE 2017',
+    where: 'MAR DEL PLATA, ARGENTINA · REMOTE',
+    pre1: 'I turn', word1: 'processes', pre2: 'into', word2: 'software', rest: ' that works.',
+    hello: "Hi, I'm Nico.",
     lead: 'Web development and automation, backed by 9 years of live TV operations at Canal 8 Mar del Plata.',
     projects: 'See projects',
     cv: 'Download CV (Spanish)',
-    onAir: 'CAM 1 · ON AIR',
-    alt: 'Portrait of Nico Coudouy',
+    available: 'AVAILABLE',
+    cardTitle: "I'm looking to join a team and I take on freelance projects.",
+    cardText: 'I reply within 24 hours.',
+    alt: 'Black-and-white portrait of Nico Coudouy',
+    services: ['Web development', 'Automation', 'Broadcast graphics', 'Editing & streaming'],
+    servicesLabel: 'What I do',
   },
 };
 
-function CameraMonitor({ onAir, alt }: { onAir: string; alt: string }) {
-  const tc = useTimecode();
-  const [focus, setFocus] = useState({ left: '50%', top: '42%' });
-
-  const onMove = (e: PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    setFocus({
-      left: `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`,
-      top: `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`,
-    });
-  };
-
-  return (
-    <figure className="cam">
-      <div className="cam-top">
-        <span className="tally"><i /><span>{onAir}</span></span>
-        <span id="tc">{tc}</span>
-      </div>
-      <div className="cam-view" onPointerMove={onMove} onPointerLeave={() => setFocus({ left: '50%', top: '42%' })}>
-        <img src="/assets/nico.jpg" alt={alt} width={640} height={641} />
-        <div className="focus" style={focus} />
-      </div>
-      <figcaption className="cam-bot">
-        <span>NICOLÁS COUDOUY</span>
-        <span>1920×1080 · 50P</span>
-      </figcaption>
-    </figure>
-  );
-}
-
 export default function Hero() {
   const c = useCopy(COPY);
+  const tc = useTimecode();
   return (
     <section className="hero" id="inicio">
       <DotField />
-      <div className="wrap">
-        <div className="hero-head">
-          <span className="status"><i />{c.status}</span>
+      <div className="wrap hero-stage">
+        <div className="hero-top">
+          <span className="onair"><i aria-hidden="true" />{c.onAir}<span className="tc" aria-hidden="true">{tc}</span></span>
+          <span className="where">{c.where}</span>
         </div>
-        <CameraMonitor onAir={c.onAir} alt={c.alt} />
-        <div className="hero-body">
-          <h1>{c.h1a}<em>{c.h1b}</em></h1>
-          <p className="lead">{c.lead}</p>
+
+        <div className="hero-visual">
+          <h1 className="hero-title">
+            <span className="t1"><small>{c.pre1}</small> <b>{c.word1}</b></span>{' '}
+            <span className="t2"><small>{c.pre2}</small> <b>{c.word2}</b></span>
+            <span className="sr-only">{c.rest}</span>
+          </h1>
+          <img className="hero-photo" src="/assets/nico-cut.webp" alt={c.alt} width={640} height={566} fetchPriority="high" />
+        </div>
+
+        <div className="hero-intro">
+          <p className="hello">{c.hello}</p>
+          <p className="hero-lead">{c.lead}</p>
           <div className="ctas">
             <Link className="btn primary" to="/proyectos">{c.projects} <ArrowUpRight /></Link>
-            <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv} <ArrowUpRight /></a>
+            <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv}</a>
           </div>
         </div>
+
+        <div className="hero-card">
+          <span className="avail"><i aria-hidden="true" />{c.available}</span>
+          <b>{c.cardTitle}</b>
+          <span>{c.cardText}</span>
+        </div>
+
+        <ol className="hero-svc" aria-label={c.servicesLabel}>
+          {c.services.map((s, i) => (
+            <li key={s}><span>● {String(i + 1).padStart(2, '0')}</span>{s}</li>
+          ))}
+        </ol>
       </div>
     </section>
   );

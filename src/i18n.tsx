@@ -3,10 +3,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 export type Lang = 'es' | 'en';
 
 const STORAGE_KEY = 'lang';
-const TITLES: Record<Lang, string> = {
-  es: 'Nico Coudouy · Desarrollo web y automatización',
-  en: 'Nico Coudouy · Web development and automation',
-};
 
 type LangContext = { lang: Lang; setLang: (lang: Lang) => void };
 const Ctx = createContext<LangContext>({ lang: 'es', setLang: () => {} });
@@ -26,7 +22,6 @@ export function LangProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.title = TITLES[lang];
   }, [lang]);
 
   const setLang = (next: Lang) => {

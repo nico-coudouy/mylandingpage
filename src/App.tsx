@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
 import Nav from './components/Nav';
 import Contact from './components/Contact';
@@ -6,15 +6,17 @@ import Assistant from './components/Assistant';
 import Home from './pages/Home';
 import { useCopy, useLang } from './i18n';
 import { LEGACY_HASHES, ROUTES } from './routes';
+import { formatTimecode } from './hooks/useTimecode';
 
 // Inner pages load on demand, so the home page ships less code.
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const COPY = {
-  es: { madeWith: 'HECHO CON REACT Y VERCEL', notFound: 'Esta página no existe.', home: 'Volver al inicio' },
-  en: { madeWith: 'MADE WITH REACT AND VERCEL', notFound: "This page doesn't exist.", home: 'Back to home' },
+  es: { madeWith: 'HECHO CON REACT Y VERCEL', end: 'FIN DE TRANSMISIÓN', onAir: 'TIEMPO AL AIRE', notFound: 'Sin señal · Nico Coudouy' },
+  en: { madeWith: 'MADE WITH REACT AND VERCEL', end: 'END OF TRANSMISSION', onAir: 'TIME ON AIR', notFound: 'No signal · Nico Coudouy' },
 };
 
 function setMeta(selector: string, attr: string, value: string) {
@@ -26,6 +28,7 @@ function PageEffects() {
   const { pathname, hash } = useLocation();
   const navigate = useNavigate();
   const { lang } = useLang();
+  const c = useCopy(COPY);
 
   useEffect(() => {
     const to = LEGACY_HASHES[hash];
@@ -37,20 +40,34 @@ function PageEffects() {
   }, [pathname, hash]);
 
   useEffect(() => {
-    const r = ROUTES.find((x) => x.path === pathname) ?? ROUTES[0];
+    const found = ROUTES.find((x) => x.path === pathname);
+    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    if (!found) {
+      document.title = c.notFound;
+      if (!robots) {
+        robots = document.createElement('meta');
+        robots.name = 'robots';
+        document.head.appendChild(robots);
+      }
+      robots.content = 'noindex';
+      return;
+    }
+    robots?.remove();
+    const r = found;
     document.title = r.title[lang];
     const url = `https://www.nicolascoudouy.com.ar${r.path === '/' ? '/' : r.path}`;
     setMeta('meta[name="description"]', 'content', r.description[lang]);
     setMeta('link[rel="canonical"]', 'href', url);
     setMeta('meta[property="og:url"]', 'content', url);
     setMeta('meta[property="og:title"]', 'content', r.title[lang]);
-  }, [pathname, lang]);
+  }, [pathname, lang, c.notFound]);
 
   return null;
 }
 
 function Layout() {
-  const c = useCopy(COPY);
+  const { pathname } = useLocation();
+  const known = ROUTES.some((r) => r.path === pathname);
   return (
     <>
       <PageEffects />
@@ -59,29 +76,41 @@ function Layout() {
         <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
           <Outlet />
         </Suspense>
-        <Contact />
+        {known && <Contact />}
       </main>
-      <footer>
-        <div className="wrap">
-          <span>© {new Date().getFullYear()} NICO COUDOUY · MAR DEL PLATA</span>
-          <span>{c.madeWith}</span>
-        </div>
-      </footer>
+      <Footer />
       <Assistant />
     </>
   );
 }
 
-function NotFound() {
+/** Closing slate: the timecode freezes on how long the visitor has been on the site. */
+function Footer() {
   const c = useCopy(COPY);
+  const ref = useRef<HTMLElement>(null);
+  const [tc, setTc] = useState('--:--:--:--');
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) setTc(formatTimecode(performance.now()));
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <section className="sec">
-      <div className="wrap sec-head">
-        <span className="eyebrow">404</span>
-        <h2>{c.notFound}</h2>
-        <a className="btn primary" href="/" style={{ alignSelf: 'flex-start' }}>{c.home}</a>
+    <footer className="eot" ref={ref}>
+      <div className="wrap">
+        <div className="eot-main">
+          <span className="eot-end"><i aria-hidden="true" />{c.end}</span>
+          <span className="eot-tc">{c.onAir} <b>{tc}</b></span>
+        </div>
+        <div className="eot-meta">
+          <span>© {new Date().getFullYear()} NICO COUDOUY · MAR DEL PLATA</span>
+          <span>{c.madeWith}</span>
+        </div>
       </div>
-    </section>
+    </footer>
   );
 }
 

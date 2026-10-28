@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowUpRight } from './Icons';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useTimecode } from '../hooks/useTimecode';
 import { CV_URL } from '../data/profile';
 import { useCopy } from '../i18n';
 
@@ -74,22 +75,6 @@ function DotField() {
   return <canvas id="field" ref={canvasRef} aria-hidden="true" />;
 }
 
-/** Live SMPTE-style timecode at 25 fps, like a broadcast monitor. */
-function useTimecode() {
-  const [tc, setTc] = useState('00:00:00:00');
-  useEffect(() => {
-    const t0 = performance.now();
-    const p = (n: number) => String(n).padStart(2, '0');
-    const id = setInterval(() => {
-      const f = Math.floor((performance.now() - t0) / 40);
-      const s = Math.floor(f / 25);
-      setTc(`00:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}:${p(f % 25)}`);
-    }, 40);
-    return () => clearInterval(id);
-  }, []);
-  return tc;
-}
-
 const COPY = {
   es: {
     onAir: 'AL AIRE DESDE 2017',
@@ -105,6 +90,7 @@ const COPY = {
     alt: 'Retrato de Nico Coudouy en blanco y negro',
     services: ['Desarrollo web', 'Automatización', 'Gráfica broadcast', 'Edición y streaming'],
     servicesLabel: 'Lo que hago',
+    roles: ['Desarrollo web y automatización', '9 años en TV en vivo · Canal 8', 'Mar del Plata · Remoto AR / LatAm'],
   },
   en: {
     onAir: 'ON AIR SINCE 2017',
@@ -120,8 +106,31 @@ const COPY = {
     alt: 'Black-and-white portrait of Nico Coudouy',
     services: ['Web development', 'Automation', 'Broadcast graphics', 'Editing & streaming'],
     servicesLabel: 'What I do',
+    roles: ['Web development & automation', '9 years in live TV · Canal 8', 'Mar del Plata · Remote'],
   },
 };
+
+/** TV-style lower third that wipes in over the portrait and cycles through roles. */
+function Zocalo({ roles }: { roles: readonly string[] }) {
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const id = setInterval(() => setI((n) => (n + 1) % roles.length), 3600);
+    return () => clearInterval(id);
+  }, [reduce, roles.length]);
+  return (
+    <div className="zocalo">
+      <div className="z-main">
+        <span className="z-bug" aria-hidden="true">NC</span>
+        <b><span>Nico Coudouy</span></b>
+      </div>
+      <div className="z-sub">
+        <span key={i} className="z-role">{roles[reduce ? 0 : i]}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function Hero() {
   const c = useCopy(COPY);
@@ -142,6 +151,7 @@ export default function Hero() {
             <span className="sr-only">{c.rest}</span>
           </h1>
           <img className="hero-photo" src="/assets/nico-cut.webp" alt={c.alt} width={640} height={566} fetchPriority="high" />
+          <Zocalo roles={c.roles} />
         </div>
 
         <div className="hero-intro">

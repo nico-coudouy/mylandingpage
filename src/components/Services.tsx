@@ -1,4 +1,5 @@
-import { CodeIcon, VideoIcon } from './Icons';
+import { Link } from 'react-router';
+import { ArrowUpRight, CodeIcon, VideoIcon } from './Icons';
 import { useCopy } from '../i18n';
 
 const COPY = {
@@ -15,6 +16,7 @@ const COPY = {
         title: 'Producción audiovisual y motion',
         text: 'Edición para redes, gráfica animada y piezas para televisión, con criterio de quien trabaja en el aire.',
         items: ['Edición de reels e historias', 'Motion graphics y animación', 'Gráfica broadcast para noticieros', 'Cámara, dirección y streaming de eventos'],
+        link: { to: '/proyectos#videos', label: 'Ver videos para clientes' },
       },
     ],
     liveTitle: 'Eventos y streaming en vivo',
@@ -43,6 +45,7 @@ const COPY = {
         title: 'Video production and motion',
         text: 'Social media editing, animated graphics and TV pieces, with the judgment of someone who works on air.',
         items: ['Reels and stories editing', 'Motion graphics and animation', 'Broadcast graphics for newscasts', 'Camera, directing and event streaming'],
+        link: { to: '/proyectos#videos', label: 'See client videos' },
       },
     ],
     liveTitle: 'Live events and streaming',
@@ -78,6 +81,7 @@ export default function Services() {
               <h3>{s.title}</h3>
               <p>{s.text}</p>
               <ul>{s.items.map((item) => <li key={item}>{item}</li>)}</ul>
+              {'link' in s && s.link && <Link className="hw-link svc-link" to={s.link.to}>{s.link.label} <ArrowUpRight size={14} /></Link>}
             </div>
           ))}
         </div>

@@ -36,7 +36,19 @@ function PageEffects() {
   }, [hash, pathname, navigate]);
 
   useEffect(() => {
-    if (!hash) window.scrollTo(0, 0);
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    // Inner pages load lazily: wait a moment for the target section to exist, then scroll to it.
+    let tries = 0, raf = 0;
+    const seek = () => {
+      const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (el) el.scrollIntoView({ block: 'start' });
+      else if (++tries < 90) raf = requestAnimationFrame(seek);
+    };
+    seek();
+    return () => cancelAnimationFrame(raf);
   }, [pathname, hash]);
 
   useEffect(() => {

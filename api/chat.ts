@@ -38,6 +38,7 @@ PROYECTOS
 - Redactó el protocolo de producción audiovisual y gestión de activos de Canal 8.
 - Tiza: app web para reservar clases en distintos gimnasios, con marca propia por gimnasio, cupos y créditos. Está en etapa de piloto con un gimnasio de Mar del Plata: nunca digas que está en producción ni que la usan varios gimnasios. Supabase y Vercel.
 - Festival Internacional de Cine de Mar del Plata: edita y anima videos para las redes del festival en las ediciones 2024, 2025 y 2026.
+- Cursos online para clientes: dirigió, grabó y editó el curso completo de bordado en pedrería de Valito González (2022), y grabó y editó cursos de Mercado Rawson (clasificación y lavado de la madera, pintura abstracta; 2021 y 2022). También grabó y editó clips para el estudio Martín Ramos Peruzzo Arquitectura (2021). Están en la sección de videos de la página de proyectos.
 - LiveRundown: proyecto en desarrollo (no está en uso), un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
 - Bot Pilot: chatbots con IA para Instagram, Facebook y WhatsApp. Este asistente es una demo de esa tecnología.
 

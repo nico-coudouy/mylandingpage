@@ -47,10 +47,20 @@ const COPY = {
   },
 };
 
-/** The largest thumbnail isn't generated for every upload; fall back to the one that always exists. */
-function thumbFallback(e: SyntheticEvent<HTMLImageElement>) {
-  const img = e.currentTarget;
-  if (!img.src.includes('hqdefault')) img.src = img.src.replace(/[a-z]+default\.jpg$/, 'hqdefault.jpg');
+/**
+ * YouTube doesn't generate every thumbnail size for every upload. A missing size comes back as a
+ * 120×90 grey placeholder (not always as an error), so step down until a real image loads.
+ */
+const SIZES = ['maxresdefault', 'sddefault', 'hqdefault'];
+function nextThumb(img: HTMLImageElement) {
+  const cur = SIZES.findIndex((s) => img.src.includes(`/${s}.jpg`));
+  if (cur >= 0 && cur < SIZES.length - 1) img.src = img.src.replace(`/${SIZES[cur]}.jpg`, `/${SIZES[cur + 1]}.jpg`);
+}
+function thumbLoaded(e: SyntheticEvent<HTMLImageElement>) {
+  if (e.currentTarget.naturalWidth <= 120) nextThumb(e.currentTarget);
+}
+function thumbFailed(e: SyntheticEvent<HTMLImageElement>) {
+  nextThumb(e.currentTarget);
 }
 
 /**
@@ -84,7 +94,8 @@ export default function Multiview() {
             <button type="button" className="mv-tile" onClick={() => setOpen(v)} aria-label={`${c.play}: ${v.kind[lang]} ${v.title}, ${v.client}, ${v.year}`}>
               <img
                 src={`https://i.ytimg.com/vi/${v.id}/${i === 0 ? 'maxresdefault' : 'hqdefault'}.jpg`}
-                onError={thumbFallback}
+                onLoad={thumbLoaded}
+                onError={thumbFailed}
                 alt=""
                 width={i === 0 ? 1280 : 480}
                 height={i === 0 ? 720 : 360}

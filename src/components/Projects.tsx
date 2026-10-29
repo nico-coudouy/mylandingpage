@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FILTERS, PROJECTS, type Category, type Project } from '../data/projects';
 import { useCopy, useLang } from '../i18n';
 import { ArrowUpRight } from './Icons';
+import Multiview from './Multiview';
 
 const COPY = {
   es: { eyebrow: 'Proyectos', title: 'Trabajo real, en uso todos los días.', filter: 'Filtrar proyectos', more: 'Más proyectos', details: 'Ver detalle' },
@@ -101,6 +102,7 @@ export default function Projects() {
             {featured.map((p) => <FeaturedCase key={p.id} p={p} />)}
           </div>
         )}
+        {(filter === 'all' || filter === 'av') && <Multiview />}
         {compact.length > 0 && (
           <div className="more">
             {featured.length > 0 && <h3 className="more-title">{c.more}</h3>}

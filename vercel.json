@@ -11,6 +11,11 @@
       ],
       "destination": "https://www.nicolascoudouy.com.ar/:path*",
       "permanent": true
+    },
+    {
+      "source": "/baristas",
+      "destination": "https://batalla-de-baristas.vercel.app/",
+      "permanent": false
     }
   ],
   "headers": [

@@ -6,6 +6,7 @@ import BrowserPreview from '../components/projects/BrowserPreview';
 import AutomationConsole from '../components/projects/AutomationConsole';
 import AudiovisualMedia, { FestivalEditions } from '../components/projects/AudiovisualMedia';
 import TizaDemo from '../components/projects/TizaDemo';
+import BaristasLinks from '../components/projects/BaristasLinks';
 
 export type Category = 'web' | 'auto' | 'broadcast' | 'av';
 
@@ -231,7 +232,7 @@ export const PROJECTS: Project[] = [
     categories: ['web'],
     tags: ['JavaScript', 'PeerJS · WebRTC', 'Playwright', 'Vercel'],
     media: <AutoVideo src="/assets/baristas-demo.mp4" poster="/assets/baristas-demo.jpg" label="Demo de Batalla de Baristas: armado de la mesa, disparos por turnos y celebración del ganador" />,
-    href: 'https://batalla-de-baristas.vercel.app/',
+    action: <BaristasLinks />,
     text: {
       es: {
         eyebrow: 'Proyecto personal · Juego web',
@@ -240,9 +241,8 @@ export const PROJECTS: Project[] = [
         details: [
           { label: 'Problema', text: 'Jugar de a dos, cada uno desde su teléfono, sin instalar nada ni crear usuarios.' },
           { label: 'Solución', text: 'Conexión directa entre los dos navegadores con PeerJS (WebRTC), salas por código, reconexión automática y partida guardada en el celular. Las piezas son una máquina de espresso, un molinillo, una prensa francesa, una moka y una taza, todas ilustradas.' },
-          { label: 'Resultado', text: 'Terminado y publicado. Probado de punta a punta simulando dos jugadores con Playwright. Para probarlo solo, abrilo en dos pestañas.' },
+          { label: 'Resultado', text: 'Terminado y publicado. Código separado por módulos, con tests de las reglas y una prueba de dos navegadores jugando una partida completa con Playwright. Para probarlo solo, abrilo en dos pestañas.' },
         ],
-        link: 'Jugar',
       },
       en: {
         eyebrow: 'Personal project · Web game',
@@ -251,9 +251,8 @@ export const PROJECTS: Project[] = [
         details: [
           { label: 'Problem', text: 'Two people playing, each on their own phone, without installing anything or signing up.' },
           { label: 'Solution', text: 'A direct browser-to-browser connection with PeerJS (WebRTC), rooms by code, automatic reconnection and the match saved on the phone. The pieces are an espresso machine, a grinder, a French press, a moka pot and a cup, all illustrated.' },
-          { label: 'Result', text: 'Finished and live. Tested end to end by simulating two players with Playwright. To try it alone, open it in two tabs.' },
+          { label: 'Result', text: 'Finished and live. Modular code with tests for the rules and an end-to-end test where two browsers play a full match with Playwright. To try it alone, open it in two tabs.' },
         ],
-        link: 'Play',
       },
     },
   },

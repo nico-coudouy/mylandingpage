@@ -226,6 +226,38 @@ export const PROJECTS: Project[] = [
     },
   },
   {
+    id: 'baristas',
+    featured: false,
+    categories: ['web'],
+    tags: ['JavaScript', 'PeerJS · WebRTC', 'Playwright', 'Vercel'],
+    media: <AutoVideo src="/assets/baristas-demo.mp4" poster="/assets/baristas-demo.jpg" label="Demo de Batalla de Baristas: armado de la mesa, disparos por turnos y celebración del ganador" />,
+    href: 'https://batalla-de-baristas.vercel.app/',
+    text: {
+      es: {
+        eyebrow: 'Proyecto personal · Juego web',
+        title: 'Batalla de Baristas',
+        summary: 'Batalla naval con temática de café para dos celulares. Uno crea la mesa, comparte un código y juegan en tiempo real, sin cuentas ni base de datos. Lo hice porque soy fanático del café.',
+        details: [
+          { label: 'Problema', text: 'Jugar de a dos, cada uno desde su teléfono, sin instalar nada ni crear usuarios.' },
+          { label: 'Solución', text: 'Conexión directa entre los dos navegadores con PeerJS (WebRTC), salas por código, reconexión automática y partida guardada en el celular. Las piezas son una máquina de espresso, un molinillo, una prensa francesa, una moka y una taza, todas ilustradas.' },
+          { label: 'Resultado', text: 'Terminado y publicado. Probado de punta a punta simulando dos jugadores con Playwright. Para probarlo solo, abrilo en dos pestañas.' },
+        ],
+        link: 'Jugar',
+      },
+      en: {
+        eyebrow: 'Personal project · Web game',
+        title: 'Batalla de Baristas',
+        summary: 'A coffee-themed Battleship for two phones. One player sets the table, shares a code and both play in real time, with no accounts and no database. I built it because I love coffee.',
+        details: [
+          { label: 'Problem', text: 'Two people playing, each on their own phone, without installing anything or signing up.' },
+          { label: 'Solution', text: 'A direct browser-to-browser connection with PeerJS (WebRTC), rooms by code, automatic reconnection and the match saved on the phone. The pieces are an espresso machine, a grinder, a French press, a moka pot and a cup, all illustrated.' },
+          { label: 'Result', text: 'Finished and live. Tested end to end by simulating two players with Playwright. To try it alone, open it in two tabs.' },
+        ],
+        link: 'Play',
+      },
+    },
+  },
+  {
     id: 'liverundown',
     featured: false,
     categories: ['broadcast', 'web'],

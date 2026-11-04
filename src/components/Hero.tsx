@@ -108,11 +108,48 @@ const COPY = {
   },
 };
 
+/**
+ * Salida del hero con GSAP + ScrollTrigger: al bajar, las dos líneas del título se separan y la foto
+ * se acerca un poco, como un movimiento de cámara. Va atado al scroll (scrub), sin fijar la sección.
+ * GSAP se descarga aparte, después de la primera pantalla. Sin animación si el sistema pide menos movimiento.
+ */
+function useHeroExit(ref: React.RefObject<HTMLElement | null>) {
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    const hero = ref.current;
+    if (!hero || reduce) return;
+    let revert = () => {};
+    let cancelled = false;
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
+      mm.add({ desktop: '(min-width: 901px)', mobile: '(max-width: 900px)' }, (ctx) => {
+        const desktop = !!ctx.conditions?.desktop;
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 },
+        });
+        tl.to(hero.querySelector('.hero-title .t1'), { y: desktop ? -140 : -50 }, 0)
+          .to(hero.querySelector('.hero-title .t2'), { y: desktop ? 70 : 30 }, 0)
+          .fromTo(hero.querySelector('.hero-photo'), { '--zoom': 1 }, { '--zoom': desktop ? 1.12 : 1.05 }, 0); // variable CSS: no pisa el translate que centra la foto
+      });
+      revert = () => mm.revert();
+    });
+    return () => {
+      cancelled = true;
+      revert();
+    };
+  }, [ref, reduce]);
+}
+
 export default function Hero() {
   const c = useCopy(COPY);
   const tc = useTimecode();
+  const heroRef = useRef<HTMLElement>(null);
+  useHeroExit(heroRef);
   return (
-    <section className="hero" id="inicio">
+    <section className="hero" id="inicio" ref={heroRef}>
       <DotField />
       <div className="wrap hero-stage">
         <div className="hero-top">

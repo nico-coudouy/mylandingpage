@@ -353,6 +353,12 @@ footer.eot::before{content:"";position:absolute;left:0;right:0;top:-1px;height:3
 /* screenshots and vertical videos in cards */
 /* console screenshot: full width under the tool list, opens in a lightbox */
 .console-shot{grid-column:1/-1;border-top:1px solid var(--line);background:#0B0B0C;padding:14px}
+.tut-poster{position:relative;display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#000;cursor:pointer;aspect-ratio:16/9}
+.tut-poster img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.8);transition:filter .3s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.tut-poster:hover img,.tut-poster:focus-visible img{filter:none;transform:scale(1.015)}
+.tut-play{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;display:grid;place-items:center;padding-left:3px;background:var(--accent);color:var(--ink);box-shadow:0 0 0 9px rgba(255,91,31,.22)}
+.tut-cap{position:absolute;right:12px;top:12px;font:500 12px var(--mono);letter-spacing:.08em;color:#fff;background:rgba(14,14,15,.82);padding:7px 11px;border-radius:7px}
+.tut-video{display:block;width:100%;aspect-ratio:16/9;border-radius:10px;background:#000;border:1px solid var(--line)}
 .shot{position:relative;display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:none;cursor:zoom-in}
 .shot img{display:block;width:100%;height:auto;transition:transform .4s ease}
 .shot:hover img{transform:scale(1.015)}

@@ -111,7 +111,7 @@ export const PROJECTS: Project[] = [
     id: 'automatizaciones',
     featured: true,
     categories: ['auto', 'broadcast'],
-    tags: ['Python', 'PyInstaller', 'Airtable API', 'Squid CGX'],
+    tags: ['Python', 'PyInstaller', 'JavaScript', 'Airtable', 'Squid CGX'],
     media: <AutomationConsole />,
     text: {
       es: {
@@ -121,7 +121,7 @@ export const PROJECTS: Project[] = [
         details: [
           { label: 'Problema', text: 'Búsquedas manuales en el archivo de video y rundowns que se cargaban a mano en la gráfica antes de cada programa.' },
           { label: 'Solución', text: 'Scripts y apps a medida que conectan las herramientas que el canal ya usa.' },
-          { label: 'Resultado', text: 'El escáner del archivo le ahorra al equipo entre 4 y 6 horas por semana.' },
+          { label: 'Resultado', text: 'El escáner del archivo le ahorra al equipo entre 4 y 6 horas por semana. Cargar los zócalos de un programa (unos 39) pasó de media hora a 5 minutos.' },
         ],
       },
       en: {
@@ -131,7 +131,7 @@ export const PROJECTS: Project[] = [
         details: [
           { label: 'Problem', text: 'Manual searches through the video archive, and rundowns typed into the graphics system by hand before every show.' },
           { label: 'Solution', text: 'Custom scripts and apps that connect the tools the station already uses.' },
-          { label: 'Result', text: 'The archive scanner saves the team 4 to 6 hours every week.' },
+          { label: 'Result', text: 'The archive scanner saves the team 4 to 6 hours every week. Loading a show’s lower thirds (about 39) went from half an hour to 5 minutes.' },
         ],
       },
     },

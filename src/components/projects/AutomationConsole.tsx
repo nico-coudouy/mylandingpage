@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useLang } from '../../i18n';
 
-type Shot = { src: string; width: number; height: number; alt: { es: string; en: string } };
+type Video = { src: string; poster: string; label: { es: string; en: string } };
 
 const TOOLS: {
   name: { es: string; en: string };
@@ -10,7 +10,7 @@ const TOOLS: {
   cmd: string;
   ok: { es: string; en: string };
   desc: { es: string; en: string };
-  image?: Shot;
+  video?: Video;
 }[] = [
   {
     name: { es: 'Escáner del archivo', en: 'Archive scanner' },
@@ -24,38 +24,36 @@ const TOOLS: {
   },
   {
     name: { es: 'Rundowns a la gráfica', en: 'Rundowns to graphics' },
-    meta: 'AIRTABLE · SQUID CGX',
-    cmd: '$ rundown airtable → squid cgx',
-    ok: { es: '✓ rundown del día cargado en la gráfica', en: "✓ today's rundown loaded into the graphics system" },
+    meta: 'AIRTABLE · CSV · SQUID CGX',
+    cmd: '$ rundown.csv → conversor → squid.xlsx',
+    ok: { es: '✓ 39 zócalos listos en 5 minutos', en: '✓ 39 lower thirds ready in 5 minutes' },
     desc: {
-      es: 'Toma el rundown del programa desde Airtable por API y lo convierte al formato del importador de Squid CGX, para que los zócalos estén listos antes de salir al aire.',
-      en: "Pulls the show's rundown from Airtable through its API and converts it to the Squid CGX importer format, so the lower thirds are ready before going on air.",
+      es: 'La producción escribe el rundown del programa en Airtable y descarga el CSV. El conversor lo revisa (mayúsculas, máximo 47 caracteres, volanta y texto) y arma el Excel que Squid CGX importa con Import CG playlist. Cargar los zócalos de un programa pasó de media hora a unos 5 minutos.',
+      en: "Producers write the show's rundown in Airtable and download it as CSV. The converter checks it (capitals, 47-character limit, header and text) and builds the Excel file Squid CGX imports with Import CG playlist. Loading a show's lower thirds went from half an hour to about 5 minutes.",
     },
-    image: {
-      src: '/assets/squid.jpg',
-      width: 1180,
-      height: 740,
-      alt: { es: 'Conversor de rundowns de Airtable a Squid con la vista previa de los zócalos', en: 'Airtable to Squid rundown converter with the lower-third preview' },
+    video: {
+      src: '/assets/zocalos-airtable.mp4',
+      poster: '/assets/zocalos-airtable.jpg',
+      label: { es: 'Tutorial de 1:26 para la producción: de Airtable a Squid en 5 pasos', en: '1:26 tutorial for producers: from Airtable to Squid in 5 steps' },
     },
   },
 ];
 
-/** Screenshot that opens full size in a modal dialog. */
-function Zoomable({ shot, lang }: { shot: Shot; lang: 'es' | 'en' }) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const label = lang === 'es' ? 'Ampliar captura' : 'Enlarge screenshot';
-  const close = lang === 'es' ? 'Cerrar' : 'Close';
-  return (
-    <>
-      <button type="button" className="shot" onClick={() => dialog.current?.showModal()} aria-label={`${label}: ${shot.alt[lang]}`}>
-        <img src={shot.src} alt={shot.alt[lang]} width={shot.width} height={shot.height} loading="lazy" />
-        <span className="shot-hint" aria-hidden="true">{label} ⤢</span>
+/** Tutorial video: poster with a play button; the player (and its 2 MB) only loads when pressed. */
+function Tutorial({ video, lang }: { video: Video; lang: 'es' | 'en' }) {
+  const [started, setStarted] = useState(false);
+  const play = lang === 'es' ? 'Ver el tutorial' : 'Watch the tutorial';
+  if (!started) {
+    return (
+      <button type="button" className="tut-poster" onClick={() => setStarted(true)} aria-label={`${play}: ${video.label[lang]}`}>
+        <img src={video.poster} alt="" width={1280} height={720} loading="lazy" />
+        <span className="tut-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg></span>
+        <span className="tut-cap" aria-hidden="true">{play} · 1:26</span>
       </button>
-      <dialog ref={dialog} className="lightbox" onClick={() => dialog.current?.close()} aria-label={shot.alt[lang]}>
-        <img src={shot.src} alt={shot.alt[lang]} width={shot.width} height={shot.height} />
-        <button type="button" className="lightbox-close" aria-label={close}>✕</button>
-      </dialog>
-    </>
+    );
+  }
+  return (
+    <video className="tut-video" src={video.src} poster={video.poster} controls autoPlay playsInline aria-label={video.label[lang]} />
   );
 }
 
@@ -101,7 +99,7 @@ export default function AutomationConsole() {
           </>
         )}
       </div>
-      {tool.image && <div className="console-shot"><Zoomable shot={tool.image} lang={lang} /></div>}
+      {tool.video && <div className="console-shot"><Tutorial key={tool.video.src} video={tool.video} lang={lang} /></div>}
     </div>
   );
 }

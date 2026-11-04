@@ -13,16 +13,6 @@ const TOOLS: {
   video?: Video;
 }[] = [
   {
-    name: { es: 'Escáner del archivo', en: 'Archive scanner' },
-    meta: 'PYTHON · EXCEL',
-    cmd: '$ python escaner_videos.py --anio 2026',
-    ok: { es: '✓ archivo indexado · ahorra 4 a 6 h por semana', en: '✓ archive indexed · saves 4 to 6 h a week' },
-    desc: {
-      es: 'Antes, encontrar un clip archivado era una búsqueda manual. Ahora el archivo de video se guarda en discos y el escáner arma un Excel con nombre, ruta, fecha y tamaño de cada archivo, que dice en qué disco está cada uno. Tiene interfaz gráfica y se distribuye como .exe.',
-      en: 'Finding an archived clip used to be a manual search. Now the video archive lives on hard drives, and the scanner builds an Excel file with the name, path, date and size of every clip, showing which drive holds each one. It has a GUI and ships as a Windows .exe.',
-    },
-  },
-  {
     name: { es: 'Rundowns a la gráfica', en: 'Rundowns to graphics' },
     meta: 'AIRTABLE · CSV · SQUID CGX',
     cmd: '$ rundown.csv → conversor → squid.xlsx',
@@ -35,6 +25,15 @@ const TOOLS: {
       src: '/assets/zocalos-airtable.mp4',
       poster: '/assets/zocalos-airtable.jpg',
       label: { es: 'Tutorial de 1:26 para la producción: de Airtable a Squid en 5 pasos', en: '1:26 tutorial for producers: from Airtable to Squid in 5 steps' },
+    },
+  },  {
+    name: { es: 'Escáner del archivo', en: 'Archive scanner' },
+    meta: 'PYTHON · EXCEL',
+    cmd: '$ python escaner_videos.py --anio 2026',
+    ok: { es: '✓ archivo indexado · ahorra 4 a 6 h por semana', en: '✓ archive indexed · saves 4 to 6 h a week' },
+    desc: {
+      es: 'Antes, encontrar un clip archivado era una búsqueda manual. Ahora el archivo de video se guarda en discos y el escáner arma un Excel con nombre, ruta, fecha y tamaño de cada archivo, que dice en qué disco está cada uno. Tiene interfaz gráfica y se distribuye como .exe.',
+      en: 'Finding an archived clip used to be a manual search. Now the video archive lives on hard drives, and the scanner builds an Excel file with the name, path, date and size of every clip, showing which drive holds each one. It has a GUI and ships as a Windows .exe.',
     },
   },
 ];

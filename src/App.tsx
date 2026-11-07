@@ -12,6 +12,8 @@ import { formatTimecode } from './hooks/useTimecode';
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ToolsPage = lazy(() => import('./pages/ToolsPage'));
+const ToolPage = lazy(() => import('./pages/ToolPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const COPY = {
@@ -135,6 +137,8 @@ export default function App() {
           <Route path="proyectos" element={<ProjectsPage />} />
           <Route path="servicios" element={<ServicesPage />} />
           <Route path="sobre-mi" element={<AboutPage />} />
+          <Route path="herramientas" element={<ToolsPage />} />
+          <Route path="herramientas/:slug" element={<ToolPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

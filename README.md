@@ -12,6 +12,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 
 - **Páginas:** Inicio (hero, credenciales y reel), Proyectos, Servicios y Sobre mí, con React Router, carga por página y un HTML por página con su título y descripción para buscadores.
 - **Asistente flotante:** ventana estilo Messenger disponible en todas las páginas.
+- **Herramientas (`/herramientas`):** unir y separar PDF, fotos a PDF (incluye HEIC del iPhone), QR y links de WhatsApp, y calculadora de video (timecode con drop frame, peso y bitrate). Todo se procesa en el navegador: los archivos no se suben a ningún servidor. Cada herramienta carga su código al abrirse y tiene su propia página para buscadores. El botón "¿Necesitás ayuda?" abre el asistente en modo herramienta: el navegador manda solo el nombre de la herramienta y el servidor suma la guía de `api/_toolGuides.ts`.
 - **Demo de Tiza:** la app se puede probar desde la tarjeta del proyecto, con datos de ejemplo.
 - **Reel:** video de 68 s en escritorio y versión vertical de 48 s en el celular, con controles propios (reproducir, sonido, pantalla completa y duración).
 - **Proyectos como casos:** problema, solución, resultado medible y stack, con video y capturas reales. Tres casos destacados, tarjetas compactas para el resto y filtros por Web, Automatización, Broadcast y Audiovisual.
@@ -26,7 +27,7 @@ Portfolio de **Nicolás Coudouy**: desarrollo web y automatización, con 9 años
 - **Microinteracciones:** campo de puntos que reacciona al mouse, monitor de cámara con timecode en vivo, consola que tipea comandos y navegador que recorre una web.
 - **Español e inglés:** selector ES/EN en el menú; el asistente responde en el idioma elegido.
 - **Accesible y liviano:** contraste WCAG AA, respeta `prefers-reduced-motion`, los videos se pausan fuera de pantalla, fuentes servidas desde el propio sitio y sin librerías de UI.
-- **Seguro y encontrable:** encabezados de seguridad (CSP, Referrer-Policy, X-Frame-Options), datos estructurados de Persona, `robots.txt` y `sitemap.xml`.
+- **Seguro y encontrable:** encabezados de seguridad (CSP, Referrer-Policy, X-Frame-Options), datos estructurados de Persona, `robots.txt` y `sitemap.xml` (se genera en el build a partir de `src/routes.ts`).
 
 ## Stack
 
@@ -88,7 +89,9 @@ npm run build      # build de producción en dist/
 .
 ├── .github/workflows/ci.yml # Tipos, tests y build en cada push
 ├── api/chat.ts              # Asistente: límites, validación y llamada al modelo
+├── api/_toolGuides.ts       # Lo que sabe el asistente de cada herramienta
 ├── tests/chat.test.ts       # Tests de la API (validación, límites, errores, respaldo)
+├── tests/tools.test.ts      # Tests de las herramientas (páginas, timecode, bitrate, QR, WhatsApp)
 ├── vercel.json              # Redirección del dominio viejo y encabezados de seguridad
 ├── public/
 │   ├── assets/              # Videos, capturas, foto y CV
@@ -99,7 +102,8 @@ npm run build      # build de producción en dist/
     ├── data/                # Proyectos y datos de contacto
     ├── hooks/               # useReducedMotion
     ├── i18n.tsx             # Idioma (ES/EN) y textos
-    ├── lib/chat.ts          # Cliente del asistente
+    ├── lib/                 # Cliente del asistente y lógica de las herramientas
+    ├── tools/               # Herramientas y su registro (registry.ts)
     ├── App.tsx
     └── index.css
 ```

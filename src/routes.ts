@@ -1,7 +1,17 @@
 import type { Lang } from './i18n';
+import { TOOLS } from './tools/registry';
+
+export type Route = {
+  path: string;
+  label: Record<Lang, string>;
+  title: Record<Lang, string>;
+  description: Record<Lang, string>;
+  /** False for pages that exist but are not linked from the main menu. */
+  nav?: boolean;
+};
 
 /** Pages of the site, with the title and description used in the tab and when a link is shared. */
-export const ROUTES = [
+export const ROUTES: readonly Route[] = [
   {
     path: '/',
     label: { es: 'Inicio', en: 'Home' },
@@ -30,6 +40,15 @@ export const ROUTES = [
     },
   },
   {
+    path: '/herramientas',
+    label: { es: 'Herramientas', en: 'Tools' },
+    title: { es: 'Herramientas gratis que funcionan en tu navegador · Nico Coudouy', en: 'Free tools that run in your browser · Nico Coudouy' },
+    description: {
+      es: 'Unir y separar PDF, fotos a PDF, QR y links de WhatsApp, y una calculadora de video. Gratis y sin subir tus archivos: todo se procesa en tu dispositivo.',
+      en: 'Merge and split PDFs, photos to PDF, QR codes and WhatsApp links, and a video calculator. Free, and your files never leave your device.',
+    },
+  },
+  {
     path: '/sobre-mi',
     label: { es: 'Sobre mí', en: 'About' },
     title: { es: 'Sobre mí · Nico Coudouy', en: 'About · Nico Coudouy' },
@@ -38,7 +57,14 @@ export const ROUTES = [
       en: 'IT technician with 9 years at Canal 8 Mar del Plata: from the camera to the code, and the team I work with every day.',
     },
   },
-] as const satisfies readonly { path: string; label: Record<Lang, string>; title: Record<Lang, string>; description: Record<Lang, string> }[];
+  ...TOOLS.map((t) => ({
+    path: `/herramientas/${t.slug}`,
+    label: t.name,
+    title: t.title,
+    description: t.description,
+    nav: false,
+  })),
+];
 
 /** Old one-page anchors and where they live now. */
 export const LEGACY_HASHES: Record<string, string> = {

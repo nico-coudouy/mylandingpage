@@ -107,6 +107,32 @@ describe('respuesta del modelo', () => {
   });
 });
 
+describe('modo herramienta', () => {
+  it('suma la guía de la herramienta cuando el visitante está en una', async () => {
+    const res = await call(handler, { ...question('¿cómo uno dos PDF?'), tool: 'unir-y-separar-pdf' });
+    expect(res.statusCode).toBe(200);
+    const system = sentBody().messages[0].content;
+    expect(system).toContain('MODO HERRAMIENTA');
+    expect(system).toContain('Unir y separar PDF');
+    expect(system).toContain('nunca llegan a vos');
+  });
+
+  it('ignora herramientas que no existen o nombres heredados del prototipo', async () => {
+    for (const tool of ['no-existe', 'constructor', '__proto__', 42]) {
+      await call(handler, { ...question(), tool }, { 'x-forwarded-for': `5.5.5.${String(tool).length}` });
+    }
+    for (const [, init] of fetchMock.mock.calls) {
+      expect(JSON.parse(init.body).messages[0].content).not.toContain('MODO HERRAMIENTA');
+    }
+  });
+
+  it('mantiene la instrucción de idioma después de la guía', async () => {
+    await call(handler, { ...question('help'), tool: 'qr-whatsapp', lang: 'en' });
+    const system: string = sentBody().messages[0].content;
+    expect(system.indexOf('MODO HERRAMIENTA')).toBeLessThan(system.indexOf('Answer in clear, natural English'));
+  });
+});
+
 describe('límites de uso', () => {
   it('corta en la pregunta 11 del mismo visitante y no afecta a otros', async () => {
     for (let i = 0; i < 10; i++) {

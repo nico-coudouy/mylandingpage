@@ -33,8 +33,8 @@ export default function Nav() {
         </Link>
         <nav className="links" aria-label={c.nav}>
           <div className="pages" id="nav-pages">
-            {ROUTES.map((r) => (
-              <NavLink key={r.path} to={r.path} end className={({ isActive }) => (isActive ? 'on' : undefined)}>
+            {ROUTES.filter((r) => r.nav !== false).map((r) => (
+              <NavLink key={r.path} to={r.path} end={r.path === "/"} className={({ isActive }) => (isActive ? 'on' : undefined)}>
                 {r.label[lang]}
               </NavLink>
             ))}

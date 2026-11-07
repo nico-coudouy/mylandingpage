@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { askAssistant, type ChatMessage } from '../lib/chat';
+import { useLocation } from 'react-router';
+import { askAssistant, onOpenAssistant, type ChatMessage } from '../lib/chat';
+import { toolFromPath } from '../tools/registry';
 import { useCopy, useLang } from '../i18n';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { tokenize } from '../lib/richText';
@@ -18,6 +20,7 @@ const COPY = {
     botSays: 'Asistente dice:',
     youSay: 'Vos decís:',
     greeting: 'Hola, soy el asistente de Nico. Preguntame por sus proyectos, su experiencia o cómo contactarlo :)',
+    toolGreeting: (tool: string) => `Hola, soy el asistente de Nico. ¿Te ayudo con ${tool}? Tus archivos no me llegan: solo leo lo que escribís acá.`,
     suggestions: ['¿Qué tecnologías usás?', '¿Hiciste webs para clientes?', '¿Estás disponible para trabajar?', '¿Cómo te contacto?'],
     placeholder: 'Escribí tu mensaje',
     limitedPlaceholder: 'Llegaste al límite de hoy',
@@ -48,6 +51,7 @@ const COPY = {
     botSays: 'Assistant says:',
     youSay: 'You say:',
     greeting: "Hi, I'm Nico's assistant. Ask me about his projects, his experience or how to reach him :)",
+    toolGreeting: (tool: string) => `Hi, I'm Nico's assistant. Need help with ${tool}? Your files never reach me: I only read what you type here.`,
     suggestions: ['What technologies do you use?', 'Have you built websites for clients?', 'Are you available for work?', 'How can I contact you?'],
     placeholder: 'Type your message',
     limitedPlaceholder: "You've reached today's limit",
@@ -131,6 +135,10 @@ export default function Assistant() {
   const bubbleRef = useRef<HTMLButtonElement>(null);
   const lastNudge = useRef(0);
   const play = useSound();
+  // On a tool page the assistant helps with that tool (the server adds its guide).
+  const tool = toolFromPath(useLocation().pathname);
+  const greeting = tool ? c.toolGreeting(tool.name[lang]) : c.greeting;
+  const suggestions = tool ? tool.suggestions[lang] : c.suggestions;
 
   useEffect(() => {
     const el = threadRef.current;
@@ -177,6 +185,9 @@ export default function Assistant() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Help buttons elsewhere on the page open the window.
+  useEffect(() => onOpenAssistant(show), []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const ask = async (question: string) => {
     const q = question.trim().slice(0, MAX_CHARS);
     if (!q || busy || limited) return;
@@ -187,7 +198,7 @@ export default function Assistant() {
     const history: ChatMessage[] = next
       .filter((l) => l.role !== 'event' && !l.local)
       .map((l) => ({ role: l.role as 'user' | 'assistant', content: l.content }));
-    const reply = await askAssistant(history.slice(-HISTORY_SENT), lang);
+    const reply = await askAssistant(history.slice(-HISTORY_SENT), lang, tool?.slug);
     setLines((m) => [...m, { role: 'assistant', content: reply.answer, time: clock() }]);
     if (soundOn) play('ding');
     if (reply.remaining !== null) setRemaining(reply.remaining);
@@ -280,7 +291,7 @@ export default function Assistant() {
             <div className="msn-thread" ref={threadRef} aria-live="polite">
               <div className="msn-msg">
                 <span className="who bot">{c.botSays}</span>
-                <p><Rich text={c.greeting} /></p>
+                <p><Rich text={greeting} /></p>
               </div>
               {lines.map((l, k) => l.role === 'event' ? (
                 <div key={k} className="msn-event">— {l.content} —</div>
@@ -294,7 +305,7 @@ export default function Assistant() {
 
             {lines.length === 0 && (
               <div className="sugg msn-sugg">
-                {c.suggestions.map((s) => <button key={s} onClick={() => ask(s)}>{s}</button>)}
+                {suggestions.map((s) => <button key={s} onClick={() => ask(s)}>{s}</button>)}
               </div>
             )}
 

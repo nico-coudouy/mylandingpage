@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { TOOL_GUIDES } from './_toolGuides';
 
 /* ───────────── Configuration ───────────── */
 
@@ -54,6 +55,23 @@ Email: nicocoudouy@gmail.com · WhatsApp: +54 9 223 593-7732 · LinkedIn: linked
 
 PERSONAL
 Entrena CrossFit y le gusta salir a la costa con sus perros.`;
+
+/** Extra instructions while the visitor is using one of the tools in /herramientas. */
+function toolInstruction(slug: string): string {
+  const { name, guide } = TOOL_GUIDES[slug];
+  return `
+
+MODO HERRAMIENTA
+El visitante está usando la herramienta "${name}" de la sección Herramientas de la web de Nico (nicolascoudouy.com.ar/herramientas). En este modo, además de hablar de Nico, podés explicar cómo usar esta herramienta y responder dudas generales sobre ese tema, en 2 a 4 oraciones. Usá esta guía y no inventes funciones que no estén en ella:
+${guide}
+Los archivos se procesan en el navegador del visitante y nunca llegan a vos ni a ningún servidor: no pidas que te los manden. Si la guía no alcanza para resolver la duda, o la persona necesita algo a medida, sugerí escribirle a Nico por WhatsApp al +54 9 223 593-7732.`;
+}
+
+/** Only slugs defined on the server are accepted; anything else is ignored. */
+function readTool(body: unknown): string | null {
+  const tool = (body as { tool?: unknown })?.tool;
+  return typeof tool === 'string' && Object.hasOwn(TOOL_GUIDES, tool) ? tool : null;
+}
 
 const LANG_INSTRUCTION = {
   es: '',
@@ -143,13 +161,13 @@ function sanitize(body: unknown): Msg[] | null {
   return msgs;
 }
 
-async function complete(url: string, key: string, model: string, messages: Msg[], lang: Lang): Promise<string> {
+async function complete(url: string, key: string, model: string, messages: Msg[], system: string): Promise<string> {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
       model,
-      messages: [{ role: 'system', content: SYSTEM_PROMPT + LANG_INSTRUCTION[lang] }, ...messages],
+      messages: [{ role: 'system', content: system }, ...messages],
       max_tokens: LIMITS.maxTokens + (isReasoningModel(model) ? REASONING_TOKENS : 0),
       temperature: 0.4,
       ...(isReasoningModel(model) ? { reasoning_effort: 'low' } : {}),
@@ -164,11 +182,12 @@ async function complete(url: string, key: string, model: string, messages: Msg[]
 }
 
 /** Groq first; optional OpenAI-compatible fallback (Cerebras, Gemini, etc.) via FALLBACK_* variables. */
-async function answer(messages: Msg[], lang: Lang): Promise<string> {
+async function answer(messages: Msg[], lang: Lang, tool: string | null): Promise<string> {
+  const system = SYSTEM_PROMPT + (tool ? toolInstruction(tool) : '') + LANG_INSTRUCTION[lang];
   const errors: unknown[] = [];
   if (process.env.GROQ_API_KEY) {
     try {
-      return await complete(GROQ_URL, process.env.GROQ_API_KEY, GROQ_MODEL, messages, lang);
+      return await complete(GROQ_URL, process.env.GROQ_API_KEY, GROQ_MODEL, messages, system);
     } catch (e) {
       errors.push(e);
     }
@@ -176,7 +195,7 @@ async function answer(messages: Msg[], lang: Lang): Promise<string> {
   const { FALLBACK_API_URL: url, FALLBACK_API_KEY: key, FALLBACK_MODEL: model } = process.env;
   if (url && key && model) {
     try {
-      return await complete(url, key, model, messages, lang);
+      return await complete(url, key, model, messages, system);
     } catch (e) {
       errors.push(e);
     }
@@ -246,7 +265,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const text = await answer(messages, lang);
+    const text = await answer(messages, lang, readTool(req.body));
     return res.status(200).json({ answer: text, remaining: limit.remaining });
   } catch (e) {
     console.error('Error del proveedor de IA', e);

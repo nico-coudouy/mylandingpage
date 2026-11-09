@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import { TOOL_GUIDES } from './_toolGuides';
+// Node ESM on Vercel needs the .js extension on relative imports, or the function crashes at startup.
+import { TOOL_GUIDES } from './_toolGuides.js';
 
 /* ───────────── Configuration ───────────── */
 
@@ -28,7 +29,7 @@ PERFIL
 - Vive en Mar del Plata, Argentina. Hace desarrollo web y automatización.
 - Trabaja desde octubre de 2017 en Canal 8 Mar del Plata (9 años): cámara, dirección de cámaras, control de aire, gráfica Squid/CGX, edición y soporte IT.
 - Freelance desde 2015: edición de video, soporte IT y desarrollo web.
-- Formación: Técnico en Informática (E.E.T. N°3, 2011). Cursa la Tecnicatura en Programación en Teclab (egreso previsto en diciembre de 2027). Inglés básico técnico.
+- Formación: Técnico en Informática (E.E.T. N°3, 2011). Cursa la Tecnicatura en Programación en Teclab (egreso previsto en diciembre de 2027). Inglés intermedio técnico (lectura y escritura).
 
 PROYECTOS
 - Teleocho Informa (Canal 8): paquete gráfico animado del noticiero de las 13, generado con código (HTML Canvas, Playwright, FFmpeg). 38 piezas entregadas en 50p, con 6 fondos por sección en loops de 40 segundos, aperturas, separadores y placas.
@@ -42,7 +43,7 @@ PROYECTOS
 - Batalla de Baristas (proyecto personal, terminado): batalla naval con temática de café para dos celulares, en tiempo real con conexión directa entre navegadores (PeerJS/WebRTC), salas por código y reconexión automática, sin cuentas ni base de datos. Lo hizo porque es fanático del café. Se juega en batalla-de-baristas.vercel.app.
 - Cursos online para clientes: dirigió, grabó y editó el curso completo de bordado en pedrería de Valito González (2022), y grabó y editó cursos de Mercado Rawson (clasificación y lavado de la madera, pintura abstracta; 2021 y 2022). También grabó y editó clips para el estudio Martín Ramos Peruzzo Arquitectura (2021). Están en la sección de videos de la página de proyectos.
 - LiveRundown: proyecto en desarrollo (no está en uso), un rundown de televisión en tiempo real con vistas por rol (React, Supabase Realtime, OSC, OBS WebSocket).
-- Bot Pilot: chatbots con IA para Instagram, Facebook y WhatsApp. Este asistente es una demo de esa tecnología.
+- Chatbots con IA para Instagram, Facebook y WhatsApp: un servicio que Nico hace para negocios, con su nombre. Este asistente es una demo de esa tecnología.
 
 TECNOLOGÍAS
 Python, TypeScript, JavaScript, PHP, SQL, React, Next.js, Tailwind CSS, Vite, Supabase, PostgreSQL, MySQL, Firebase, Vercel, Docker, Git, fundamentos de AWS, APIs de LLMs, Squid CGX, OBS, CasparCG, Premiere Pro y After Effects.

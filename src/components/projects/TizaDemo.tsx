@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Link } from 'react-router';
 import { useCopy, useLang } from '../../i18n';
 
 /* ───────── sample data (invented gyms, nothing touches the real app) ───────── */
@@ -21,6 +22,8 @@ const COPY = {
     title: 'Demo de Tiza',
     note: 'Demo con datos de ejemplo. La app real usa Supabase con usuarios, cupos y créditos.',
     reset: 'Reiniciar demo', close: 'Cerrar demo',
+    more: 'Ver más proyectos', page: 'Tiza · Demo · Nico Coudouy',
+    pageDesc: 'Probá la demo de Tiza: reservá una clase de tu gimnasio en dos toques. Datos de ejemplo.',
     pick: 'Elegí tu gimnasio', tagline: 'Los turnos de tu gimnasio, en dos toques.',
     hello: 'Hola, invitado', book: 'Reservá tu clase', back: 'Cambiar de gimnasio',
     next: 'PRÓXIMA CLASE', none: 'Todavía no reservaste.', credits: 'CRÉDITOS', expires: 'Vencen en 30 días',
@@ -41,6 +44,8 @@ const COPY = {
     title: 'Tiza demo',
     note: 'Demo with sample data. The real app uses Supabase with accounts, class limits and credits.',
     reset: 'Reset demo', close: 'Close demo',
+    more: 'See more projects', page: 'Tiza · Demo · Nico Coudouy',
+    pageDesc: 'Try the Tiza demo: book a class at your gym in two taps. Sample data.',
     pick: 'Pick your gym', tagline: 'Your gym’s classes, booked in two taps.',
     hello: 'Hi, guest', book: 'Book your class', back: 'Change gym',
     next: 'NEXT CLASS', none: 'No bookings yet.', credits: 'CREDITS', expires: 'Expire in 30 days',
@@ -257,5 +262,43 @@ export default function TizaDemo() {
         </div>
       </dialog>
     </>
+  );
+}
+
+/** Stand-alone demo for /tiza: opens straight into the app, full screen on phones. Shared from Instagram. */
+export function TizaStandalone() {
+  const c = useCopy(COPY);
+  const { lang } = useLang();
+  const [run, setRun] = useState(0);
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 2200);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  useEffect(() => {
+    document.title = c.page;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', c.pageDesc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', 'https://www.nicolascoudouy.com.ar/tiza');
+  }, [c.page, c.pageDesc]);
+
+  return (
+    <div className="tz-page" lang={lang}>
+      <div className="tz-wrap">
+        <div className="tz-top">
+          <span>{c.title}</span>
+          <button type="button" onClick={() => setRun((r) => r + 1)}>{c.reset}</button>
+        </div>
+        <div className="tz-phone">
+          <div className="tz-notch" aria-hidden="true" />
+          <App key={run} onToast={(text) => setToast({ id: Date.now(), text })} />
+          {toast && <div key={toast.id} className="tz-toast" role="status"><i>✓</i>{toast.text}</div>}
+        </div>
+        <p className="tz-note">{c.note}</p>
+        <Link className="tz-more" to="/proyectos">{c.more} <span aria-hidden="true">→</span></Link>
+      </div>
+    </div>
   );
 }

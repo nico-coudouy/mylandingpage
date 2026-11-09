@@ -599,6 +599,17 @@ footer.eot::before{content:"";position:absolute;left:0;right:0;top:-1px;height:3
 .tz-toast{position:absolute;left:24px;right:24px;bottom:84px;z-index:6;display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:16px;background:#22232A;border:1px solid #33343C;font-size:14px;font-weight:600;color:#EDEDF2;animation:tz-toast .3s cubic-bezier(.2,.8,.2,1)}
 .tz-toast i{font-style:normal;flex:none;width:22px;height:22px;border-radius:50%;background:var(--mint);color:#0E0E0F;display:grid;place-items:center;font-size:12px}
 @keyframes tz-toast{from{transform:translateY(16px);opacity:0}}
+.tz-page{min-height:100vh;min-height:100dvh;background:var(--bg,#0E0E0F)}
+.tz-page .tz-wrap{min-height:100vh;min-height:100dvh}
+.tz-more{font:500 13px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg);text-decoration:none;border:1px solid var(--line2);border-radius:999px;padding:9px 16px}
+.tz-more:hover{border-color:var(--mint)}
+@media (max-width:560px){
+  .tz-page .tz-wrap{padding:12px 0 14px;gap:10px}
+  .tz-page .tz-top,.tz-page .tz-note{padding:0 16px}
+  .tz-page .tz-phone{width:100%;height:calc(100dvh - 150px);min-height:460px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+  .tz-page .tz-notch{display:none}
+  .tz-page .tz-screen{border-radius:0}
+}
 @media (max-width:520px){
   .tz-wrap{padding:10px 10px 14px;justify-content:flex-start}
   .tz-phone{height:calc(100dvh - 120px);min-height:480px;border-radius:40px;padding:7px}

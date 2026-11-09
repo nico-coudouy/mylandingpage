@@ -15,6 +15,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ToolsPage = lazy(() => import('./pages/ToolsPage'));
 const ToolPage = lazy(() => import('./pages/ToolPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const TizaPage = lazy(() => import('./pages/TizaPage'));
 
 const COPY = {
   es: { madeWith: 'HECHO CON REACT Y VERCEL', end: 'FIN DE TRANSMISIÓN', onAir: 'TIEMPO AL AIRE', notFound: 'Sin señal · Nico Coudouy' },
@@ -132,6 +133,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Direct link to the Tiza demo (shared from Instagram): no menu or footer, just the app. */}
+        <Route path="tiza" element={<Suspense fallback={<div className="page-loading" aria-busy="true" />}><TizaPage /></Suspense>} />
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="proyectos" element={<ProjectsPage />} />

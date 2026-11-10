@@ -14,7 +14,7 @@
     },
     {
       "source": "/baristas",
-      "destination": "https://batalla-de-baristas.vercel.app/",
+      "destination": "/batalladebaristas/",
       "permanent": false
     }
   ],
@@ -22,10 +22,6 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline' https://vercel.live; img-src 'self' data: blob: https://i.ytimg.com https://vercel.live https://vercel.com; media-src 'self'; font-src 'self' data: https://vercel.live https://assets.vercel.com; connect-src 'self' https://vercel.live wss://ws-us3.pusher.com; frame-src https://www.youtube-nocookie.com https://vercel.live; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
-        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -43,12 +39,33 @@
           "value": "camera=(), microphone=(), geolocation=(), payment=()"
         }
       ]
+    },
+    {
+      "source": "/((?!batalladebaristas).*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline' https://vercel.live; img-src 'self' data: blob: https://i.ytimg.com https://vercel.live https://vercel.com; media-src 'self'; font-src 'self' data: https://vercel.live https://assets.vercel.com; connect-src 'self' https://vercel.live wss://ws-us3.pusher.com; frame-src https://www.youtube-nocookie.com https://vercel.live; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+        }
+      ]
     }
   ],
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/((?!api/|assets/).*)",
+      "source": "/batalladebaristas",
+      "destination": "https://batalla-de-baristas.vercel.app/"
+    },
+    {
+      "source": "/batalladebaristas/",
+      "destination": "https://batalla-de-baristas.vercel.app/"
+    },
+    {
+      "source": "/batalladebaristas/:path*",
+      "destination": "https://batalla-de-baristas.vercel.app/:path*"
+    },
+    {
+      "source": "/((?!api/|assets/|batalladebaristas).*)",
       "destination": "/"
     }
   ]

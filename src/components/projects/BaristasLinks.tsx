@@ -1,7 +1,7 @@
 import { useLang } from '../../i18n';
 import { ArrowUpRight } from '../Icons';
 
-const GAME = 'https://batalla-de-baristas.vercel.app/';
+const GAME = '/batalladebaristas/';
 const CODE = 'https://github.com/nico-coudouy/batalla-de-baristas';
 
 /** Jugar y ver el código, lado a lado. */

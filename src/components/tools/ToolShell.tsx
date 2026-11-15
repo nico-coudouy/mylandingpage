@@ -8,7 +8,7 @@ import type { Tool } from '../../tools/registry';
 
 const COPY = {
   es: {
-    back: 'Herramientas',
+    back: 'Recursos',
     local: 'Se procesa en tu dispositivo',
     localNote: 'Tus archivos no se suben a ningún servidor.',
     help: '¿Necesitás ayuda?',
@@ -18,7 +18,7 @@ const COPY = {
     customMsg: (tool: string) => `Hola Nico, vi la herramienta "${tool}" en tu web y quería consultarte por algo a medida.`,
   },
   en: {
-    back: 'Tools',
+    back: 'Resources',
     local: 'Runs on your device',
     localNote: 'Your files are never uploaded to a server.',
     help: 'Need help?',
@@ -39,7 +39,7 @@ export default function ToolShell({ tool, local = true, children }: { tool: Tool
       <div className="wrap">
         <div className="tool-head">
           <nav className="tool-crumb mono" aria-label="Breadcrumb">
-            <Link to="/herramientas">{c.back}</Link>
+            <Link to="/recursos#herramientas">{c.back}</Link>
             <span aria-hidden="true">/</span>
             <span>CH {tool.ch}</span>
           </nav>

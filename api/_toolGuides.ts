@@ -31,13 +31,4 @@ export const TOOL_GUIDES: Record<string, { name: string; guide: string }> = {
 - Los QR no vencen ni dependen de ningún servicio: el contenido va dentro del código. Si cambia la contraseña del wifi o la web, hay que hacer un QR nuevo.
 - Para imprimir, conviene que mida al menos 3 x 3 cm, y más grande si se escanea de lejos (una regla práctica: 1 cm de lado por cada 10 cm de distancia).`,
   },
-  'calculadora-video': {
-    name: 'Calculadora de video',
-    guide: `- Tiene tres partes: "Timecode", "Peso del archivo" y "Bitrate para un peso máximo".
-- Timecode: se elige la cadencia (23.976, 24, 25, 29.97 con drop frame, 30, 50, 59.94 con drop frame, 60) y convierte entre timecode HH:MM:SS:FF, cantidad de cuadros y segundos. También suma o resta dos timecodes.
-- Drop frame: en 29.97 y 59.94 se saltean números de cuadro (no cuadros reales) para que el timecode coincida con el reloj. Se escribe con punto y coma antes de los cuadros (01:00:00;00).
-- Peso: con la duración, el bitrate de video y el de audio calcula cuánto va a pesar el archivo. Es una estimación: los archivos reales varían por el bitrate variable y el contenedor.
-- Bitrate para un peso máximo: con la duración y el tamaño límite (por ejemplo 25 MB para adjuntarlo en Gmail) dice qué bitrate total usar.
-- Referencias habituales para redes: vertical 1080x1920, entre 8 y 15 Mbps para Instagram y TikTok. Para dudas de un caso puntual, sugerí escribirle a Nico.`,
-  },
 };

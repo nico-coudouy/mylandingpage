@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation } from 'react-router';
 import { askAssistant, onOpenAssistant, type ChatMessage } from '../lib/chat';
 import { toolFromPath } from '../tools/registry';
+import { explainerFromPath } from '../explainers/registry';
 import { useCopy, useLang } from '../i18n';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { tokenize } from '../lib/richText';
@@ -21,6 +22,7 @@ const COPY = {
     youSay: 'Vos decís:',
     greeting: 'Hola, soy el asistente de Nico. Preguntame por sus proyectos, su experiencia o cómo contactarlo :)',
     toolGreeting: (tool: string) => `Hola, soy el asistente de Nico. ¿Te ayudo con ${tool}? Tus archivos no me llegan: solo leo lo que escribís acá.`,
+    topicGreeting: (topic: string) => `Hola, soy el asistente de Nico. ¿Te quedó alguna duda sobre "${topic}"? Preguntame lo que quieras, sin tecnicismos.`,
     suggestions: ['¿Qué tecnologías usás?', '¿Hiciste webs para clientes?', '¿Estás disponible para trabajar?', '¿Cómo te contacto?'],
     placeholder: 'Escribí tu mensaje',
     limitedPlaceholder: 'Llegaste al límite de hoy',
@@ -52,6 +54,7 @@ const COPY = {
     youSay: 'You say:',
     greeting: "Hi, I'm Nico's assistant. Ask me about his projects, his experience or how to reach him :)",
     toolGreeting: (tool: string) => `Hi, I'm Nico's assistant. Need help with ${tool}? Your files never reach me: I only read what you type here.`,
+    topicGreeting: (topic: string) => `Hi, I'm Nico's assistant. Any questions about "${topic}"? Ask me anything, no jargon.`,
     suggestions: ['What technologies do you use?', 'Have you built websites for clients?', 'Are you available for work?', 'How can I contact you?'],
     placeholder: 'Type your message',
     limitedPlaceholder: "You've reached today's limit",
@@ -136,8 +139,11 @@ export default function Assistant() {
   const lastNudge = useRef(0);
   const play = useSound();
   // On a tool page the assistant helps with that tool (the server adds its guide).
-  const tool = toolFromPath(useLocation().pathname);
-  const greeting = tool ? c.toolGreeting(tool.name[lang]) : c.greeting;
+  // On an "Explicado simple" page it explains that topic in plain words.
+  const pathname = useLocation().pathname;
+  const tool = toolFromPath(pathname) ?? explainerFromPath(pathname);
+  const isTopic = !!tool && !toolFromPath(pathname);
+  const greeting = tool ? (isTopic ? c.topicGreeting(tool.name[lang]) : c.toolGreeting(tool.name[lang])) : c.greeting;
   const suggestions = tool ? tool.suggestions[lang] : c.suggestions;
 
   useEffect(() => {

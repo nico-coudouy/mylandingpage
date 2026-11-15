@@ -28,7 +28,8 @@ function pageHtml(): Plugin {
           .replace(/(<meta property="og:title" content=")[^"]*/, `$1${esc(r.title.es)}`)
           .replace(/(<meta property="og:description" content=")[^"]*/, `$1${esc(r.description.es)}`)
           .replace(/(<link rel="canonical" href=")[^"]*/, `$1${url}`)
-          .replace(/(<meta property="og:url" content=")[^"]*/, `$1${url}`);
+          .replace(/(<meta property="og:url" content=")[^"]*/, `$1${url}`)
+          .replace(/(<meta property="og:image" content=")[^"]*/, (m, p1) => (r.image ? p1 + SITE + r.image : m));
         const file = resolve(dist, `${r.path.slice(1)}.html`);
         mkdirSync(dirname(file), { recursive: true });
         writeFileSync(file, html);

@@ -13,6 +13,16 @@
       "permanent": true
     },
     {
+      "source": "/herramientas",
+      "destination": "/recursos#herramientas",
+      "permanent": true
+    },
+    {
+      "source": "/herramientas/calculadora-video",
+      "destination": "/recursos#herramientas",
+      "permanent": true
+    },
+    {
       "source": "/baristas",
       "destination": "/batalladebaristas/",
       "permanent": false

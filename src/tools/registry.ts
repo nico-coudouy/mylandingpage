@@ -79,30 +79,11 @@ export const TOOLS: Tool[] = [
       en: ['Does the QR code expire?', 'How do I make a wifi QR code?', 'What size should I print it?'],
     },
   },
-  {
-    slug: 'calculadora-video',
-    files: false,
-    ch: '04',
-    name: { es: 'Calculadora de video', en: 'Video calculator' },
-    short: {
-      es: 'Timecode, cuadros por segundo y cuánto va a pesar un video según el bitrate.',
-      en: 'Timecode, frame rates and how big a video will be for a given bitrate.',
-    },
-    title: { es: 'Calculadora de video: timecode, fps y peso por bitrate · Nico Coudouy', en: 'Video calculator: timecode, fps and file size by bitrate · Nico Coudouy' },
-    description: {
-      es: 'Convertí timecode a cuadros y segundos en 23.976, 25, 29.97 y 50 fps, y calculá el peso de un video o el bitrate que necesitás para un tamaño máximo.',
-      en: 'Convert timecode to frames and seconds at 23.976, 25, 29.97 and 50 fps, and work out file size or the bitrate you need for a size limit.',
-    },
-    suggestions: {
-      es: ['¿Qué bitrate uso para Instagram?', '¿Qué es el drop frame?', '¿Por qué mi video pesa más de lo calculado?'],
-      en: ['What bitrate should I use for Instagram?', 'What is drop frame?', 'Why is my file bigger than calculated?'],
-    },
-  },
 ];
 
 export const toolBySlug = (slug: string | undefined) => TOOLS.find((t) => t.slug === slug);
 
-/** Slug of the tool open at this path, if any. */
+/** Tool open at this path, if any. */
 export function toolFromPath(pathname: string): Tool | undefined {
   const m = pathname.match(/^\/herramientas\/([^/]+)\/?$/);
   return m ? toolBySlug(m[1]) : undefined;

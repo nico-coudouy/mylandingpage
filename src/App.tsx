@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
 import Nav from './components/Nav';
 import Contact from './components/Contact';
 import Assistant from './components/Assistant';
@@ -12,7 +12,8 @@ import { formatTimecode } from './hooks/useTimecode';
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
-const ToolsPage = lazy(() => import('./pages/ToolsPage'));
+const ResourcesPage = lazy(() => import('./pages/ResourcesPage'));
+const ExplainerPage = lazy(() => import('./pages/ExplainerPage'));
 const ToolPage = lazy(() => import('./pages/ToolPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const TizaPage = lazy(() => import('./pages/TizaPage'));
@@ -140,7 +141,10 @@ export default function App() {
           <Route path="proyectos" element={<ProjectsPage />} />
           <Route path="servicios" element={<ServicesPage />} />
           <Route path="sobre-mi" element={<AboutPage />} />
-          <Route path="herramientas" element={<ToolsPage />} />
+          <Route path="recursos" element={<ResourcesPage />} />
+          <Route path="explicado/:slug" element={<ExplainerPage />} />
+          {/* The tools list moved inside Recursos; the tool pages keep their URLs. */}
+          <Route path="herramientas" element={<Navigate to="/recursos#herramientas" replace />} />
           <Route path="herramientas/:slug" element={<ToolPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

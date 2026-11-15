@@ -62,10 +62,15 @@ describe('registro de herramientas', () => {
       }
     }
   });
-  it('las páginas de herramientas no aparecen en el menú, la sección sí', () => {
+  it('el menú tiene Recursos; las herramientas y explicaciones no aparecen sueltas', () => {
     const menu = ROUTES.filter((r) => r.nav !== false).map((r) => r.path);
-    expect(menu).toContain('/herramientas');
-    expect(menu.some((p) => p.startsWith('/herramientas/'))).toBe(false);
+    expect(menu).toContain('/recursos');
+    expect(menu).not.toContain('/herramientas');
+    expect(menu.some((p) => p.startsWith('/herramientas/') || p.startsWith('/explicado/'))).toBe(false);
+  });
+  it('la calculadora de video ya no está', () => {
+    expect(TOOLS.some((t) => t.slug === 'calculadora-video')).toBe(false);
+    expect(TOOL_GUIDES['calculadora-video']).toBeUndefined();
   });
   it('reconoce la herramienta abierta desde la URL', () => {
     expect(toolFromPath('/herramientas/fotos-a-pdf')?.slug).toBe('fotos-a-pdf');
@@ -75,67 +80,7 @@ describe('registro de herramientas', () => {
   });
 });
 
-import { fileSizeBytes, framesToTimecode, parseDuration, rateById, secondsToFrames, timecodeToFrames, videoBitrateFor, framesToSeconds } from '../src/lib/videoMath';
 import { wifiPayload, makeQr } from '../src/lib/qr';
-
-describe('timecode', () => {
-  const r25 = rateById('25');
-  const df30 = rateById('29.97df');
-  const df60 = rateById('59.94df');
-
-  it('convierte en ida y vuelta en 25 fps', () => {
-    expect(timecodeToFrames('01:00:00:00', r25)).toBe(90000);
-    expect(framesToTimecode(90000 + 24, r25)).toBe('01:00:00:24');
-    expect(timecodeToFrames('00:00:00:25', r25)).toBeNull();
-  });
-
-  it('respeta el drop frame de 29.97', () => {
-    expect(timecodeToFrames('00:01:00;02', df30)).toBe(1800);
-    expect(framesToTimecode(1800, df30)).toBe('00:01:00;02');
-    expect(framesToTimecode(1799, df30)).toBe('00:00:59;29');
-    expect(timecodeToFrames('00:10:00;00', df30)).toBe(17982);
-    expect(timecodeToFrames('01:00:00;00', df30)).toBe(107892);
-    expect(timecodeToFrames('00:01:00;00', df30)).toBeNull(); // ese número no existe
-    for (const f of [0, 1, 1799, 1800, 17981, 17982, 107891, 123456]) {
-      expect(timecodeToFrames(framesToTimecode(f, df30), df30)).toBe(f);
-    }
-  });
-
-  it('respeta el drop frame de 59.94', () => {
-    expect(timecodeToFrames('01:00:00;00', df60)).toBe(215784);
-    for (const f of [0, 3599, 3600, 35964, 215783]) {
-      expect(timecodeToFrames(framesToTimecode(f, df60), df60)).toBe(f);
-    }
-  });
-
-  it('una hora en 23.976 dura 3603,6 segundos de reloj', () => {
-    const r = rateById('23.976');
-    const frames = timecodeToFrames('01:00:00:00', r)!;
-    expect(frames).toBe(86400);
-    expect(framesToSeconds(frames, r)).toBeCloseTo(3603.6, 5);
-    expect(secondsToFrames(10, r25)).toBe(250);
-  });
-});
-
-describe('peso y bitrate', () => {
-  it('lee duraciones en segundos, mm:ss y hh:mm:ss', () => {
-    expect(parseDuration('90')).toBe(90);
-    expect(parseDuration('1:30')).toBe(90);
-    expect(parseDuration('01:01:30')).toBe(3690);
-    expect(parseDuration('2,5')).toBe(2.5);
-    expect(parseDuration('a:10')).toBeNull();
-    expect(parseDuration('0')).toBeNull();
-  });
-  it('calcula el peso: 60 s a 8 Mbps + 192 kbps ≈ 61,4 MB', () => {
-    expect(fileSizeBytes(60, 8, 192)).toBe(61_440_000);
-  });
-  it('calcula el bitrate de video para un peso máximo', () => {
-    const v = videoBitrateFor(25, 60, 128)!;
-    expect(v).toBeCloseTo(3.105, 3);
-    expect(fileSizeBytes(60, v, 128)).toBeLessThan(25e6);
-    expect(videoBitrateFor(1, 3600, 320)).toBeNull();
-  });
-});
 
 describe('QR', () => {
   it('arma el texto de wifi escapando caracteres especiales', () => {

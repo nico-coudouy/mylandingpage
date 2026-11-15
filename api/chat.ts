@@ -3,6 +3,7 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 // Node ESM on Vercel needs the .js extension on relative imports, or the function crashes at startup.
 import { TOOL_GUIDES } from './_toolGuides.js';
+import { TOPIC_GUIDES } from './_topicGuides.js';
 
 /* ───────────── Configuration ───────────── */
 
@@ -63,15 +64,31 @@ function toolInstruction(slug: string): string {
   return `
 
 MODO HERRAMIENTA
-El visitante está usando la herramienta "${name}" de la sección Herramientas de la web de Nico (nicolascoudouy.com.ar/herramientas). En este modo, además de hablar de Nico, podés explicar cómo usar esta herramienta y responder dudas generales sobre ese tema, en 2 a 4 oraciones. Usá esta guía y no inventes funciones que no estén en ella:
+El visitante está usando la herramienta "${name}" de la sección Recursos de la web de Nico (nicolascoudouy.com.ar/recursos). En este modo, además de hablar de Nico, podés explicar cómo usar esta herramienta y responder dudas generales sobre ese tema, en 2 a 4 oraciones. Usá esta guía y no inventes funciones que no estén en ella:
 ${guide}
 Los archivos se procesan en el navegador del visitante y nunca llegan a vos ni a ningún servidor: no pidas que te los manden. Si la guía no alcanza para resolver la duda, o la persona necesita algo a medida, sugerí escribirle a Nico por WhatsApp al +54 9 223 593-7732.`;
+}
+
+/** Extra instructions while the visitor is on one of the "Explicado simple" pages. */
+function topicInstruction(slug: string): string {
+  const { name, guide } = TOPIC_GUIDES[slug];
+  return `
+
+MODO EXPLICADO SIMPLE
+El visitante está en "${name}", una explicación interactiva de la sección Recursos de la web de Nico. Explicá el tema con palabras simples, como a alguien que no trabaja en televisión ni en programación, en 2 a 4 oraciones, con ejemplos cotidianos. Usá esta guía y no inventes datos ni funciones:
+${guide}
+Si la persona quiere algo parecido para su trabajo, sugerí escribirle a Nico por WhatsApp al +54 9 223 593-7732.`;
+}
+
+function contextInstruction(slug: string | null): string {
+  if (!slug) return '';
+  return Object.hasOwn(TOOL_GUIDES, slug) ? toolInstruction(slug) : topicInstruction(slug);
 }
 
 /** Only slugs defined on the server are accepted; anything else is ignored. */
 function readTool(body: unknown): string | null {
   const tool = (body as { tool?: unknown })?.tool;
-  return typeof tool === 'string' && Object.hasOwn(TOOL_GUIDES, tool) ? tool : null;
+  return typeof tool === 'string' && (Object.hasOwn(TOOL_GUIDES, tool) || Object.hasOwn(TOPIC_GUIDES, tool)) ? tool : null;
 }
 
 const LANG_INSTRUCTION = {
@@ -184,7 +201,7 @@ async function complete(url: string, key: string, model: string, messages: Msg[]
 
 /** Groq first; optional OpenAI-compatible fallback (Cerebras, Gemini, etc.) via FALLBACK_* variables. */
 async function answer(messages: Msg[], lang: Lang, tool: string | null): Promise<string> {
-  const system = SYSTEM_PROMPT + (tool ? toolInstruction(tool) : '') + LANG_INSTRUCTION[lang];
+  const system = SYSTEM_PROMPT + contextInstruction(tool) + LANG_INSTRUCTION[lang];
   const errors: unknown[] = [];
   if (process.env.GROQ_API_KEY) {
     try {

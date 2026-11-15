@@ -9,7 +9,6 @@ const COMPONENTS: Record<string, ReturnType<typeof lazy>> = {
   'unir-y-separar-pdf': lazy(() => import('../tools/PdfTool')),
   'fotos-a-pdf': lazy(() => import('../tools/PhotosToPdf')),
   'qr-whatsapp': lazy(() => import('../tools/QrTool')),
-  'calculadora-video': lazy(() => import('../tools/VideoCalculator')),
 };
 
 export default function ToolPage() {

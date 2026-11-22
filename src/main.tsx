@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/700.css';
 import App from './App.tsx';
 import { LangProvider } from './i18n';
 import './index.css';

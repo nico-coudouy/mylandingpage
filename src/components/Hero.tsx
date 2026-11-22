@@ -2,84 +2,22 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { ArrowUpRight } from './Icons';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useTimecode } from '../hooks/useTimecode';
 import { CV_URL } from '../data/profile';
-import { useCopy } from '../i18n';
+import { useCopy, useLang } from '../i18n';
+import { portraitCode, startLensHero, type LensHero, type LensLabels } from '../lib/lensHero';
+import zocaloSource from '../lib/zocalo.ts?raw';
 
-/** Faint dot grid behind the hero that warms up around the pointer. */
-function DotField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const hero = canvas?.parentElement;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !hero || !ctx) return;
-
-    let w = 0, h = 0, raf = 0, visible = true;
-    let mx = -999, my = -999, tx = -999, ty = -999;
-
-    const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      w = hero.clientWidth;
-      h = hero.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    const onMove = (e: globalThis.PointerEvent) => {
-      const r = hero.getBoundingClientRect();
-      tx = e.clientX - r.left;
-      ty = e.clientY - r.top;
-    };
-    const onLeave = () => { tx = ty = -999; };
-
-    const draw = (time: number) => {
-      if (visible) {
-        mx += (tx - mx) * 0.12;
-        my += (ty - my) * 0.12;
-        ctx.clearRect(0, 0, w, h);
-        const sp = 34, t = time / 1000;
-        for (let y = sp / 2; y < h; y += sp) {
-          for (let x = sp / 2; x < w; x += sp) {
-            const wave = Math.sin(x * 0.006 + t * 0.6) * Math.cos(y * 0.008 - t * 0.4);
-            const glow = tx < -900 ? 0 : Math.max(0, 1 - Math.hypot(x - mx, y - my) / 220);
-            const a = (0.04 + Math.max(0, wave) * 0.06 + glow * 0.55).toFixed(3);
-            ctx.fillStyle = glow > 0.05 ? `rgba(255,91,31,${a})` : `rgba(242,238,231,${a})`;
-            const s = 1.6 + glow * 1.6;
-            ctx.fillRect(x - s / 2, y - s / 2, s, s);
-          }
-        }
-      }
-      if (!reduce) raf = requestAnimationFrame(draw);
-    };
-
-    resize();
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; });
-    io.observe(hero);
-    window.addEventListener('resize', resize);
-    hero.addEventListener('pointermove', onMove);
-    hero.addEventListener('pointerleave', onLeave);
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      io.disconnect();
-      window.removeEventListener('resize', resize);
-      hero.removeEventListener('pointermove', onMove);
-      hero.removeEventListener('pointerleave', onLeave);
-    };
-  }, [reduce]);
-
-  return <canvas id="field" ref={canvasRef} aria-hidden="true" />;
-}
+/** El retrato final se dibuja con el código real del sitio. */
+const CODE = portraitCode(zocaloSource);
 
 const COPY = {
   es: {
     onAir: 'AL AIRE DESDE 2017',
     where: 'MAR DEL PLATA · REMOTO AR / LATAM',
-    pre1: 'Convierto', word1: 'procesos', pre2: 'en', word2: 'software', rest: ' que funciona.',
+    steps: ['01 FOCO', '02 SENSOR', '03 CÓDIGO'],
+    skip: 'SALTAR INTRO ↓',
+    hint: 'SCROLLEÁ',
+    pre1: 'Convierto', word1: 'procesos', pre2: 'en', word2: 'software', rest: 'que funciona.',
     hello: 'Hola, soy Nico.',
     lead: 'Desarrollo web y automatización, con 9 años de experiencia en televisión en vivo en Canal 8 Mar del Plata.',
     projects: 'Ver proyectos',
@@ -90,11 +28,18 @@ const COPY = {
     alt: 'Retrato de Nico Coudouy en blanco y negro',
     services: ['Desarrollo web', 'Automatización', 'Gráfica broadcast', 'Edición y streaming'],
     servicesLabel: 'Lo que hago',
+    labels: {
+      out: 'FUERA DE FOCO', focusing: 'ENFOCANDO', ok: 'EN FOCO', sensor: 'LECTURA DEL SENSOR', code: 'RAW → CÓDIGO',
+      faceSearch: 'AF · BUSCANDO', faceLock: 'AF · ROSTRO', luma: 'LUMA', chars: 'CARACTERES',
+    } satisfies LensLabels,
   },
   en: {
     onAir: 'ON AIR SINCE 2017',
     where: 'MAR DEL PLATA, ARGENTINA · REMOTE',
-    pre1: 'I turn', word1: 'processes', pre2: 'into', word2: 'software', rest: ' that works.',
+    steps: ['01 FOCUS', '02 SENSOR', '03 CODE'],
+    skip: 'SKIP INTRO ↓',
+    hint: 'SCROLL',
+    pre1: 'I turn', word1: 'processes', pre2: 'into', word2: 'software', rest: 'that works.',
     hello: "Hi, I'm Nico.",
     lead: 'Web development and automation, backed by 9 years of live TV operations at Canal 8 Mar del Plata.',
     projects: 'See projects',
@@ -105,88 +50,125 @@ const COPY = {
     alt: 'Black-and-white portrait of Nico Coudouy',
     services: ['Web development', 'Automation', 'Broadcast graphics', 'Editing & streaming'],
     servicesLabel: 'What I do',
+    labels: {
+      out: 'OUT OF FOCUS', focusing: 'FOCUSING', ok: 'IN FOCUS', sensor: 'SENSOR READOUT', code: 'RAW → CODE',
+      faceSearch: 'AF · SEARCHING', faceLock: 'AF · FACE', luma: 'LUMA', chars: 'CHARACTERS',
+    } satisfies LensLabels,
   },
 };
 
 /**
- * Salida del hero con GSAP + ScrollTrigger: al bajar, las dos líneas del título se separan y la foto
- * se acerca un poco, como un movimiento de cámara. Va atado al scroll (scrub), sin fijar la sección.
- * GSAP se descarga aparte, después de la primera pantalla. Sin animación si el sistema pide menos movimiento.
+ * Hero "del lente al código": la foto se enfoca sola al cargar y, con el scroll, pasa al sensor
+ * y se convierte en código. La animación vive en src/lib/lensHero.ts. Con "reducir movimiento"
+ * se muestra directo el estado final, sin scroll extra.
  */
-function useHeroExit(ref: React.RefObject<HTMLElement | null>) {
-  const reduce = useReducedMotion();
-  useEffect(() => {
-    const hero = ref.current;
-    if (!hero || reduce) return;
-    let revert = () => {};
-    let cancelled = false;
-    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
-      if (cancelled) return;
-      gsap.registerPlugin(ScrollTrigger);
-      const mm = gsap.matchMedia();
-      mm.add({ desktop: '(min-width: 901px)', mobile: '(max-width: 900px)' }, (ctx) => {
-        const desktop = !!ctx.conditions?.desktop;
-        const tl = gsap.timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 },
-        });
-        tl.to(hero.querySelector('.hero-title .t1'), { y: desktop ? -140 : -50 }, 0)
-          .to(hero.querySelector('.hero-title .t2'), { y: desktop ? 70 : 30 }, 0)
-          .fromTo(hero.querySelector('.hero-photo'), { '--zoom': 1 }, { '--zoom': desktop ? 1.12 : 1.05 }, 0); // variable CSS: no pisa el translate que centra la foto
-      });
-      revert = () => mm.revert();
-    });
-    return () => {
-      cancelled = true;
-      revert();
-    };
-  }, [ref, reduce]);
-}
-
 export default function Hero() {
   const c = useCopy(COPY);
-  const tc = useTimecode();
-  const heroRef = useRef<HTMLElement>(null);
-  useHeroExit(heroRef);
+  const { lang } = useLang();
+  const reduce = useReducedMotion();
+  const rootRef = useRef<HTMLElement>(null);
+  const heroRef = useRef<LensHero | null>(null);
+  const labelsRef = useRef(c.labels);
+  labelsRef.current = c.labels;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const hero = startLensHero(root, { reduce, code: CODE, labels: () => labelsRef.current });
+    heroRef.current = hero;
+    return () => { hero.destroy(); heroRef.current = null; };
+  }, [reduce]);
+
+  // Las palabras de fondo cambian de largo con el idioma.
+  useEffect(() => { heroRef.current?.refit(); }, [lang]);
+
+  const services = (
+    <>
+      {c.services.map((s, i) => (
+        <li key={s}><span>● {String(i + 1).padStart(2, '0')}</span>{s}</li>
+      ))}
+    </>
+  );
+
   return (
-    <section className="hero" id="inicio" ref={heroRef}>
-      <DotField />
-      <div className="wrap hero-stage">
-        <div className="hero-top">
-          <span className="onair"><i aria-hidden="true" />{c.onAir}<span className="tc" aria-hidden="true">{tc}</span></span>
-          <span className="where">{c.where}</span>
-        </div>
-
-        <div className="hero-visual">
-          <h1 className="hero-title">
-            <span className="t1"><small>{c.pre1}</small> <b>{c.word1}</b></span>{' '}
-            <span className="t2"><small>{c.pre2}</small> <b>{c.word2}</b></span>
-            <span className="sr-only">{c.rest}</span>
-          </h1>
-          <img className="hero-photo" src="/assets/nico-cut.webp" alt={c.alt} width={640} height={566} fetchPriority="high" />
-        </div>
-
-        <div className="hero-intro">
-          <p className="hello">{c.hello}</p>
-          <p className="hero-lead">{c.lead}</p>
-          <div className="ctas">
-            <Link className="btn primary" to="/proyectos">{c.projects} <ArrowUpRight /></Link>
-            <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv}</a>
+    <>
+      <section className={`lens${reduce ? ' reduce' : ''}`} id="inicio" ref={rootRef}>
+        <div className="lens-stage" data-l="stage">
+          <canvas className="lens-field" data-l="field" aria-hidden="true" />
+          <div className="lens-safe" aria-hidden="true">
+            <i className="act" /><i className="tit" />
+            <span className="la">ACTION SAFE 93%</span><span className="lt">TITLE SAFE 90%</span>
           </div>
-        </div>
+          <div className="lens-hud" aria-hidden="true"><i className="tl" /><i className="tr" /><i className="bl" /><i className="br" /></div>
 
-        <div className="hero-card">
-          <span className="avail"><i aria-hidden="true" />{c.available}</span>
-          <b>{c.cardTitle}</b>
-          <span>{c.cardText}</span>
-        </div>
+          <div className="lens-row r1" aria-hidden="true">
+            <span className="lens-onair"><i />{c.onAir}<span className="tc" data-l="tc">00:00:00:00</span></span>
+            <span className="lens-where">{c.where}</span>
+          </div>
+          <div className="lens-row r2" aria-hidden="true">
+            <span><b>NICO COUDOUY</b> · DEV + BROADCAST</span>
+            <span className="lens-fstate" data-l="fstate" />
+          </div>
+          <div className="lens-row r3">
+            <span className="lens-steps" aria-hidden="true">
+              <span data-l="s1" className="on">{c.steps[0]}</span><span data-l="s2">{c.steps[1]}</span><span data-l="s3">{c.steps[2]}</span>
+            </span>
+            <button className="lens-skip" type="button" data-l="skip" onClick={() => heroRef.current?.skip()}>{c.skip}</button>
+          </div>
 
-        <ol className="hero-svc" aria-label={c.servicesLabel}>
-          {c.services.map((s, i) => (
-            <li key={s}><span>● {String(i + 1).padStart(2, '0')}</span>{s}</li>
-          ))}
-        </ol>
+          <div className="lens-back" data-l="back" aria-hidden="true">
+            <div className="lens-glow" data-l="glow" />
+            <div className="lens-words" data-l="words"><div>{c.word1}</div><div className="w2">{c.word2}</div></div>
+          </div>
+
+          <div className="lens-shot" data-l="shot">
+            <div className="lens-media">
+              <img data-l="photo" src="/assets/nico-cut.webp" alt={c.alt} width={640} height={566} fetchPriority="high" />
+              <canvas data-l="peak" className="lens-peak" aria-hidden="true" />
+              <canvas data-l="cv" aria-hidden="true" />
+            </div>
+            <div className="lens-face" data-l="face" aria-hidden="true"><i className="a" /><i className="b" /><i className="c" /><i className="d" /><span data-l="faceLbl" /></div>
+            <div className="lens-probe" data-l="probe" aria-hidden="true"><span className="tag" data-l="ptag" /></div>
+          </div>
+
+          <div className="lens-meter lens-hist" data-l="histWrap" aria-hidden="true"><span data-l="histLbl">LUMA</span><canvas data-l="hist" /></div>
+          <div className="lens-meter lens-vu" data-l="vuWrap" aria-hidden="true"><canvas data-l="vu" /><span>L · R</span></div>
+          <div className="lens-meter lens-cambar" data-l="cambar" aria-hidden="true"><b>4K 25p</b> · HD 1080i50<span className="wb"> · 5600K</span></div>
+
+          <div className="lens-ring" data-l="ring" aria-hidden="true">
+            <span className="idx" />
+            <div className="win"><div className="scale" data-l="scale">
+              {['0.3', '0.5', '0.7', '1', '1.5', '2', '3', '5', '10', '∞'].map((d) => <span key={d}>{d}</span>)}
+            </div></div>
+            <div className="knurl" data-l="knurl" />
+          </div>
+          <div className="lens-hint" data-l="hint" aria-hidden="true">{c.hint}</div>
+
+          <div className="lens-copy" data-l="copy">
+            <div className="in">
+              <p className="lens-hello">{c.hello}</p>
+              <h1 className="lens-title">
+                <small>{c.pre1}</small> {c.word1} <small>{c.pre2}</small> <em>{c.word2}</em> <small>{c.rest}</small>
+              </h1>
+              <p className="lens-lead">{c.lead}</p>
+              <p className="lens-avail">
+                <b>{c.available}</b>
+                <span className="short">{c.cardText}</span>
+                <span className="long">{c.cardTitle} {c.cardText}</span>
+              </p>
+              <div className="ctas">
+                <Link className="btn primary" to="/proyectos">{c.projects} <ArrowUpRight /></Link>
+                <a className="btn" href={CV_URL} target="_blank" rel="noopener">{c.cv}</a>
+              </div>
+            </div>
+          </div>
+
+          <ol className="lens-svc lens-svc-stage" data-l="svc" aria-label={c.servicesLabel}>{services}</ol>
+        </div>
+      </section>
+      <div className="lens-svc-flow">
+        <ol className="lens-svc" aria-label={c.servicesLabel}>{services}</ol>
       </div>
-    </section>
+    </>
   );
 }
